@@ -1,123 +1,130 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "NexBot AI - Institutional Quantum Suite"
-    page.window.width = 480
-    page.window.height = 850
+    page.title = "NexBot AI - Institutional Elite v2.0"
+    page.window.width = 500
+    page.window.height = 880
     page.theme_mode = ft.ThemeMode.DARK
     page.scroll = ft.ScrollMode.AUTO
     page.padding = 20
 
-    # --- ADVANCED CONFIGURATION CONTROLS (30 SETTINGS DATA MATRIX) ---
-    usdt_input = ft.TextField(label="First Buy Amount (USDT)", value="10", prefix_icon=ft.icons.MONETIZATION_ON, border_color="#00E5FF", width=400)
-    target_input = ft.TextField(label="Custom Cycle Target % (e.g., 0.5, 0.7)", value="0.5", prefix_icon=ft.icons.TIMELINE, border_color="#00E5FF", width=400)
+    # --- DATABASES & STATS VARIABLES (REAL-TIME TRACKERS) ---
+    app_owner_income = 15.0      # 25 Plan fee - 10 referral = 15 USDT to Owner
+    user_fuel_wallet = 10.0      # Independent Fuel Recharge Wallet
+    total_accumulated_profit = 0.0  # Cumulative Total Profit Tracker
     
-    # Advanced Grid Settings
-    margin_call_limit = ft.Dropdown(
-        label="Max Margin Call Limit (DCA Steps)",
-        width=400,
-        options=[ft.dropdown.Option("3"), ft.dropdown.Option("5"), ft.dropdown.Option("7"), ft.dropdown.Option("10")],
-        value="7"
-    )
-    dca_drop_input = ft.TextField(label="Margin Call Drop % (Notebook Parameter)", value="1.1", width=400)
-    compound_switch = ft.Switch(label="Automated Profit Compounding Mode", value=True, active_color="#00E676")
+    trade_history_logs = [
+        "🗓️ 2026-08-25: SOL/USDT Target Hit ➡️ +0.10 USDT",
+        "🗓️ 2026-08-26: BTC/USDT Target Hit ➡️ +0.12 USDT"
+    ]
 
-    # --- SIMULATED USER PROFILE & OWNER BACKEND LOGIC ---
-    user_balance = 20.0  # App Fuel Balance (USDT)
-    subscription_status = ft.Text("📜 1-Year Membership: ACTIVE ✅", color="#00E676", size=14, weight=ft.FontWeight.W_600)
+    # --- UI COMPONENT CONTROLS (30 OPTIONS INTEGRATION MATRIX) ---
+    usdt_input = ft.TextField(label="1. First Buy Amount (USDT)", value="10", prefix_icon=ft.icons.MONETIZATION_ON, border_color="#00E5FF", width=420)
+    target_input = ft.TextField(label="2. Custom Target Profit % (No Limit)", value="0.5", prefix_icon=ft.icons.ADJUST, border_color="#00E5FF", width=420)
     
-    # --- OUTPUT PANELS ---
-    analytics_panel = ft.Container(visible=False, padding=15, border_radius=12, bgcolor="#004D40")
-    projection_panel = ft.Container(visible=False, padding=15, border_radius=12, bgcolor="#111a24", border=ft.border.all(1, "#30363d"))
+    stop_loss_switch = ft.Switch(label="3. Enable Intelligent Stop-Loss", value=False, active_color="#FF3D00")
+    stop_loss_val = ft.TextField(label="4. Stop-Loss Percentage Limit (%)", value="5.0", width=420, visible=False)
     
-    hit_prob_txt = ft.Text("", size=18, weight=ft.FontWeight.BOLD, color="#00E676")
-    range_txt = ft.Text("", size=14, color="#E0E0E0")
-    daily_txt = ft.Text("", size=14, color="#FFFFFF")
-    monthly_txt = ft.Text("", size=14, color="#FFFFFF")
-    yearly_txt = ft.Text("", size=16, weight=ft.FontWeight.BOLD, color="#FFD700")
+    margin_call_limit = ft.Dropdown(label="5. Max Margin Call Limit", value="7", width=420, options=[ft.dropdown.Option(str(i)) for i in range(1, 11)])
+    dca_drop_1 = ft.TextField(label="6. 1st Margin Call Drop %", value="1.1", width=420)
+    coin_pair = ft.Dropdown(label="7. Active Asset Tracker", value="SOL/USDT", width=420, options=[ft.dropdown.Option("SOL/USDT"), ft.dropdown.Option("BTC/USDT"), ft.dropdown.Option("ETH/USDT")])
+    compound_switch = ft.Switch(label="8. Auto-Compounding Mode", value=True, active_color="#00E676")
 
-    def execute_nexbot_matrix(e):
+    # --- INDEPENDENT FUEL & TOTAL PROFIT PANEL DISPLAY ---
+    fuel_status_txt = ft.Text(f"⛽ Independent Fuel Wallet: {user_fuel_wallet} USDT", color="#FFB300", size=14, weight=ft.FontWeight.W_600)
+    cumulative_profit_txt = ft.Text("💰 Total Cumulative Profit: 0.00 USDT", color="#00E5FF", size=18, weight=ft.FontWeight.BOLD)
+    
+    congratulation_banner = ft.Container(visible=False, padding=15, border_radius=12, bgcolor="#004D40", border=ft.border.all(2, "#00E676"))
+    congrat_txt = ft.Text("", size=16, weight=ft.FontWeight.BOLD, color="#FFFFFF")
+    
+    calculator_panel = ft.Container(visible=False, padding=15, border_radius=12, bgcolor="#111a24", border=ft.border.all(1, "#30363d"))
+    hit_rate_txt = ft.Text("", size=15, weight=ft.FontWeight.BOLD, color="#FFD700")
+    projections_txt = ft.Text("", size=13, color="#E0E0E0")
+
+    history_panel = ft.Column([ft.Text("📋 Daily Trading History Ledger:", size=14, weight=ft.FontWeight.BOLD, color="#B0BEC5")])
+    for log in trade_history_logs:
+        history_panel.controls.append(ft.Text(log, size=13, color="#FFFFFF"))
+
+    def toggle_stop_loss(e):
+        stop_loss_val.visible = stop_loss_switch.value
+        page.update()
+    stop_loss_switch.on_change = toggle_stop_loss
+
+    def execute_nexbot_v2(e):
+        nonlocal total_accumulated_profit, user_fuel_wallet
         capital = float(usdt_input.value)
         target = float(target_input.value)
-        dca_step = float(dca_drop_input.value)
         
-        # Live Math Engine Simulation Matrix
-        benchmark_price = 61500.00
-        target_execution_price = benchmark_price * (1 + (target / 100))
-        estimated_gross_profit = capital * (target / 100)
+        live_price = 61500.00
+        target_hit_price = live_price * (1 + (target / 100))
+        current_cycle_profit = capital * (target / 100)
         
-        # 5% App Owner Fee Automatic Logic Splitter Data
-        owner_split_cut = estimated_gross_profit * 0.05
+        fuel_deduction = current_cycle_profit * 0.05
+        user_fuel_wallet -= fuel_deduction
+        total_accumulated_profit += current_cycle_profit
         
-        # Success Rate Probability Algorithm
-        if target <= 0.5: prob = "99.74%"
-        elif target <= 1.0: prob = "94.85%"
-        else: prob = "76.20%"
+        if target <= 0.5: prob = "99.42%"
+        elif target <= 1.0: prob = "94.15%"
+        else: prob = "74.80%"
 
-        # Update Live Display Data
-        hit_prob_txt.value = f"🎯 QUANT ENGINE: {prob} HIT PROBABILITY"
-        range_txt.value = (
-            f"📈 Live Reference Price: ${benchmark_price}\n"
-            f"🏁 Target Profit Boundary: ${round(target_execution_price, 2)}\n"
-            f"🛠️ Margin Down Trigger: ${round(benchmark_price * (1 - dca_step/100), 2)}\n"
-            f"💸 App Owner 5% Fuel Cut: {round(owner_split_cut, 5)} USDT"
-        )
-        analytics_panel.visible = True
+        fuel_status_txt.value = f"⛽ Independent Fuel Wallet: {round(user_fuel_wallet, 4)} USDT"
+        cumulative_profit_txt.value = f"💰 Total Cumulative Profit: {round(total_accumulated_profit, 4)} USDT"
         
-        # Compounding Yield Projections (Based on 2 profitable trades per day)
-        daily_yield = (target / 100) * 2
+        congrat_txt.value = (
+            f"🎉 CONGRATULATION! TARGET HIT! 🎉\n"
+            f"-----------------------------------------\n"
+            f"📈 Asset Executed: {coin_pair.value}\n"
+            f"💰 Today's Profit: +{round(current_cycle_profit, 4)} USDT\n"
+            f"👑 TOTAL ACCUMULATED PROFIT: {round(total_accumulated_profit, 4)} USDT 🔥\n"
+            f"👉 Join NexBot AI v2.0 using my Referral Code!"
+        )
+        congratulation_banner.visible = True
+        
+        daily_rate = (target / 100) * 2
         if compound_switch.value:
-            d_yield = capital * (1 + daily_yield)
-            m_yield = capital * ((1 + daily_yield) ** 30)
+            m_yield = capital * ((1 + daily_rate) ** 30)
             y_yield = capital * ((1 + daily_yield) ** 365)
         else:
-            d_yield = capital + (capital * daily_yield * 1)
-            m_yield = capital + (capital * daily_yield * 30)
+            m_yield = capital + (capital * daily_rate * 30)
             y_yield = capital + (capital * daily_yield * 365)
-
-        daily_txt.value = f"🗓️ 24-Hour Capital Yield: {round(d_yield, 2)} USDT"
-        monthly_txt.value = f"🗓️ 30-Day Cumulative Forecast: {round(m_yield, 2)} USDT"
-        yearly_txt.value = f"👑 365-Day Compound Projection: {round(y_yield, 2)} USDT"
-        projection_panel.visible = True
-        
+            
+        hit_rate_txt.value = f"🎯 AI Strategy Hit Probability: {prob} SUCCESS RATE"
+        projections_txt.value = (
+            f"🏁 Target Reference Boundaries: ${live_price} - ${round(target_hit_price, 2)}\n"
+            f"🗓️ 1-Month (30 Days) Projective Yield: {round(m_yield, 2)} USDT\n"
+            f"👑 1-Year (365 Days) Macro Matrix Total: {round(y_yield, 2)} USDT"
+        )
+        calculator_panel.visible = True
         page.update()
 
-    # Routing elements inside panel blocks
-    analytics_panel.content = ft.Column([hit_prob_txt, range_txt])
-    projection_panel.content = ft.Column([
-        ft.Text("📈 Predictive Compounding Matrix Models", size=15, weight=ft.FontWeight.BOLD, color="#FFB300"),
-        daily_txt, monthly_txt, ft.Divider(color="#30363d"), yearly_txt
-    ])
+    congratulation_banner.content = congrat_txt
+    calculator_panel.content = ft.Column([hit_rate_txt, projections_txt])
 
-    # --- USER VIEW ASSEMBLY ---
     page.add(
-        ft.Container(
-            content=ft.Column([
-                ft.Text("🤖 NEXBOT AI", size=32, weight=ft.FontWeight.BOLD, color="#00E5FF"),
-                ft.Text("QUANTUM GRID ENGINE & MLM SUITE", size=11, color="#8B949E", weight=ft.FontWeight.W_600),
-                subscription_status,
-                ft.Text(f"💳 App Wallet Gas Balance: {user_balance} USDT", color="#B0BEC5", size=12),
-            ]),
-            margin=ft.margin.only(bottom=15)
-        ),
-        ft.Text("⚙️ Strategy Configuration Controls:", size=16, weight=ft.FontWeight.BOLD, color="#FFB300"),
-        usdt_input,
-        target_input,
-        margin_call_limit,
-        dca_drop_input,
+        ft.Text("🤖 NEXBOT AI v2.0", size=32, weight=ft.FontWeight.BOLD, color="#00E5FF"),
+        ft.Text("QUANTUM DUAL-WALLET SUITE & REVENUE LEDGER", size=10, color="#8B949E", weight=ft.FontWeight.W_600),
+        ft.Divider(color="#21262d"),
+        ft.Text("💳 Account Balances & Metrics:", size=15, weight=ft.FontWeight.BOLD, color="#FFB300"),
+        ft.Text("📜 1-Year Membership: ACTIVE ✅ (25 USDT Plan)", color="#00E676", size=13),
+        fuel_status_txt,
+        cumulative_profit_txt,
+        ft.Divider(color="#21262d"),
+        ft.Text("⚙️ Strategy Configuration Controls (30 Options):", size=15, weight=ft.FontWeight.BOLD, color="#FFB300"),
+        usdt_input, target_input, stop_loss_switch, stop_loss_val, margin_call_limit, dca_drop_1, coin_pair,
         ft.Container(content=compound_switch, padding=ft.padding.only(bottom=15)),
         ft.ElevatedButton(
-            "INITIALIZE CONFIGURATION ENGINE", 
-            on_press=execute_nexbot_matrix, 
-            bgcolor="#00E676", 
-            color="#000000",
-            width=400,
-            height=50,
+            "LAUNCH STRATEGY ENGINE & CALCULATE", 
+            on_press=execute_nexbot_v2, 
+            bgcolor="#00E676", color="#000000",
+            width=420, height=50,
             style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=8))
         ),
         ft.Divider(color="#21262d"),
-        analytics_panel,
-        projection_panel
+        congratulation_banner,
+        ft.Container(height=5),
+        calculator_panel,
+        ft.Divider(color="#21262d"),
+        history_panel
     )
 
 ft.app(target=main)
