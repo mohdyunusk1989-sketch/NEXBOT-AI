@@ -1,18 +1,25 @@
 import streamlit as st
 import urllib.parse
 
-# Page configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v5.2", page_icon="🤖", layout="wide")
+# Force Ultra-Wide layout configuration
+st.set_page_config(page_title="NexBot AI - Institutional Elite v5.3", page_icon="🤖", layout="wide")
 
-# Force Table Alignment Style to fix any column stretching or wrapping issues completely
+# Advanced CSS injection to completely force single-line alignment and prevent vertical breaking
 st.markdown("""
     <style>
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 2rem !important;
     }
-    div[data-testid="stBlock"] {
-        margin-bottom: -15px !important;
+    div[data-testid="stHorizontalBlock"] {
+        align-items: flex-end !important;
+        gap: 12px !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+    }
+    div[data-testid="stColumn"] {
+        min-width: 130px !important;
+        flex: 1 1 0% !important;
     }
     .stTextInput input, .stSelectbox div {
         text-align: center !important;
@@ -24,7 +31,7 @@ st.markdown("""
 # Cryptocurrencies list
 binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT"]
 
-# Session State Initializations
+# Session State Storage Initializations
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "owner_income" not in st.session_state:
@@ -61,7 +68,7 @@ else:
     
     if app_mode == "🤖 Trading Core Suite":
         # Header Dynamic Ribbon
-        head_col1, head_col2 = st.columns([4, 1])
+        head_col1, head_col2 = st.columns(2)
         with head_col1:
             st.markdown("<h2 style='color: #00E5FF; margin:0px;'>🤖 NEXBOT AI v3.2</h2>", unsafe_allow_html=True)
             st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE LIVE NETWORK SUITE & CUSTOM FIXED GRID</p>", unsafe_allow_html=True)
@@ -72,36 +79,37 @@ else:
 
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 5px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 FIXED HORIZONTAL TABLE LAYOUT MATRIX: Eliminates wrapping completely!
-        # Allocating exact side-by-side spacing structure
-        row_cols = st.columns([1, 1, 1, 1, 1, 1, 1.2])
+        # 👑 THE ABSOLUTE 7-COLUMN PERFECT MATRIX INLINE LAYOUT (EXACTLY ORDERED BY YUNUS BHAI)
+        # We explicitly pre-create 7 horizontal slots to bind everything in a tight line
+        c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
         
-        with row_cols[0]:
+        with c1:
             usdt_val = st.text_input("Capital (USDT)", value="10", key="f_usdt")
+            
+        with c2:
+            # ✅ RE-ORDERED: Target Days Limit is now perfectly at position 2!
             days_input = st.text_input("Target Days Limit", value="365", key="f_days")
             
-        with row_cols[1]:
+        with c3:
             target_val = st.text_input("Daily Ratio %", value="0.5", key="f_target")
             compound_active = st.checkbox("Auto-Compound", value=True, key="f_comp")
             
-        with row_cols[2]:
+        with c4:
             coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
             
-        with row_cols[3]:
+        with c5:
             price_from = st.text_input("Current Entry Price", value="3000", key="f_p_from")
             
-        with row_cols[4]:
+        with c6:
             price_to = st.text_input("Target Hit Price", value="3500", key="f_p_to")
-            
-        with row_cols[5]:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
             
-        with row_cols[6]:
-            # ✅ ABSOLUTE DYNAMIC VALUE INJECTION: Instantly updates field upon clicking the action switch!
+        with c7:
+            # ✅ RE-ORDERED TO THE ABSOLUTE END (COLUMN 7): Live tracking value display field
             profit_box_text = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.show_success else "0.0 USDT"
             st.text_input("Profit (USDT)", value=profit_box_text, key="f_profit_output")
 
-        # ⚡ ACTION ROW DIRECTLY BELOW COLUMNS
+        # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW COLUMNS
         st.write("") 
         launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="f_submit_btn")
 
