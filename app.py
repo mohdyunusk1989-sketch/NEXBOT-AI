@@ -1,28 +1,19 @@
 import streamlit as st
 import urllib.parse
 
-# Force Ultra-Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v5.3", page_icon="🤖", layout="wide")
+# Page configuration
+st.set_page_config(page_title="NexBot AI - Institutional Elite v5.4", page_icon="🤖", layout="centered")
 
-# Advanced CSS injection to completely force single-line alignment and prevent vertical breaking
+# Custom CSS to align inputs nicely in a clean vertical list
 st.markdown("""
     <style>
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 2rem !important;
-    }
-    div[data-testid="stHorizontalBlock"] {
-        align-items: flex-end !important;
-        gap: 12px !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-    }
-    div[data-testid="stColumn"] {
-        min-width: 130px !important;
-        flex: 1 1 0% !important;
+        max-width: 550px !important;
     }
     .stTextInput input, .stSelectbox div {
-        text-align: center !important;
+        text-align: left !important;
         font-weight: bold !important;
     }
     </style>
@@ -68,48 +59,31 @@ else:
     
     if app_mode == "🤖 Trading Core Suite":
         # Header Dynamic Ribbon
-        head_col1, head_col2 = st.columns(2)
-        with head_col1:
-            st.markdown("<h2 style='color: #00E5FF; margin:0px;'>🤖 NEXBOT AI v3.2</h2>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE LIVE NETWORK SUITE & CUSTOM FIXED GRID</p>", unsafe_allow_html=True)
-        with head_col2:
-            st.markdown(f"<div style='background-color:#2D1A38; padding:8px; border-radius:5px; text-align:center; font-size:12px; font-weight:bold; color:#E040FB; margin-top:5px;'>👑 Vault: {round(st.session_state.owner_income, 2)} USDT</div>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color: #00E5FF; margin:0px;'>🤖 NEXBOT AI v3.2</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE LIVE NETWORK SUITE & CUSTOM FIXED GRID</p>", unsafe_allow_html=True)
+        st.markdown(f"<div style='background-color:#2D1A38; padding:8px; border-radius:5px; text-align:center; font-size:12px; font-weight:bold; color:#E040FB; margin-top:5px; max-width:200px;'>👑 Vault: {round(st.session_state.owner_income, 2)} USDT</div>", unsafe_allow_html=True)
         
         st.divider()
 
-        st.markdown("<h4 style='color: #FFB300; margin-bottom: 5px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 THE ABSOLUTE 7-COLUMN PERFECT MATRIX INLINE LAYOUT (EXACTLY ORDERED BY YUNUS BHAI)
-        # We explicitly pre-create 7 horizontal slots to bind everything in a tight line
-        c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
+        # 👑 PERFECT VERTICAL LIST LAYOUT (SABSE PEHLE WALA PERFECT ORDER)
+        # All 7 boxes are placed strictly in a vertical line down the page
+        usdt_val = st.text_input("1. Capital (USDT)", value="10", key="f_usdt")
+        days_input = st.text_input("2. Target Days Limit", value="365", key="f_days")
+        target_val = st.text_input("3. Daily Ratio %", value="0.5", key="f_target")
+        compound_active = st.checkbox("Auto-Compound", value=True, key="f_comp")
         
-        with c1:
-            usdt_val = st.text_input("Capital (USDT)", value="10", key="f_usdt")
-            
-        with c2:
-            # ✅ RE-ORDERED: Target Days Limit is now perfectly at position 2!
-            days_input = st.text_input("Target Days Limit", value="365", key="f_days")
-            
-        with c3:
-            target_val = st.text_input("Daily Ratio %", value="0.5", key="f_target")
-            compound_active = st.checkbox("Auto-Compound", value=True, key="f_comp")
-            
-        with c4:
-            coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
-            
-        with c5:
-            price_from = st.text_input("Current Entry Price", value="3000", key="f_p_from")
-            
-        with c6:
-            price_to = st.text_input("Target Hit Price", value="3500", key="f_p_to")
-            margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
-            
-        with c7:
-            # ✅ RE-ORDERED TO THE ABSOLUTE END (COLUMN 7): Live tracking value display field
-            profit_box_text = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.show_success else "0.0 USDT"
-            st.text_input("Profit (USDT)", value=profit_box_text, key="f_profit_output")
+        coin_selected = st.selectbox("4. Crypto Token", options=binance_all_coins, index=0, key="f_coin")
+        price_from = st.text_input("5. Current Entry Price", value="3000", key="f_p_from")
+        price_to = st.text_input("6. Target Hit Price", value="3500", key="f_p_to")
+        margin_in = st.selectbox("7. Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
+        
+        # ✅ AUTOMATIC PROFIT DISPLAY AT THE VERY END OF THE LIST
+        profit_box_text = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.show_success else "0.0 USDT"
+        st.text_input("8. Profit (USDT)", value=profit_box_text, disabled=True, key="f_profit_output")
 
-        # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW COLUMNS
+        # ⚡ ACTION ENGINE BUTTON AT THE VERY BOTTOM OF THE LIST
         st.write("") 
         launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="f_submit_btn")
 
@@ -136,35 +110,32 @@ else:
             
             st.markdown("### 📊 Live Network Strategy Summary Box Matrix")
             
-            box_col1, box_col2 = st.columns(2)
-            with box_col1:
-                st.info(f"💰 **Today's Daily Cycle Profit:** {round(st.session_state.daily_profit, 4)} USDT")
-                st.warning(f"⛽ **Independent Fuel Wallet Balance:** {round(st.session_state.fuel_wallet, 4)} USDT")
-                st.code(
-                    f"📦 Total Capital Allocated: {capital} USDT\n"
-                    f"🪙 Active Blockchain Asset: {coin_selected}\n"
-                    f"🎯 Position Hit Boundaries: From ${p_start} To ${p_end}\n"
-                    f"🛠️ Enforced Margin Parameters: {margin_in}"
-                )
+            st.info(f"💰 **Today's Daily Cycle Profit:** {round(st.session_state.daily_profit, 4)} USDT")
+            st.warning(f"⛽ **Independent Fuel Wallet Balance:** {round(st.session_state.fuel_wallet, 4)} USDT")
+            st.code(
+                f"📦 Total Capital Allocated: {capital} USDT\n"
+                f"🪙 Active Blockchain Asset: {coin_selected}\n"
+                f"🎯 Position Hit Boundaries: From ${p_start} To ${p_end}\n"
+                f"🛠️ Enforced Margin Parameters: {margin_in}"
+            )
             
-            with box_col2:
-                daily_rate = (target / 100) * 2
-                projected_yield = capital * ((1 + daily_rate) ** days_count) if compound_active else capital + (capital * daily_rate * days_count)
-                
-                st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
-                st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
-                
-                viral_text = (
-                    f"🚀 *NEXBOT AI v2.0 - TARGET POSITION HIT!* 🚀\n\n"
-                    f"🔥 *Crypto Asset Node:* {coin_selected}\n"
-                    f"🎯 *Price Target Boundaries:* ${p_start} ➡️ ${p_end} (🎯 Hit Successful!)\n"
-                    f"📈 *Today's Cycle Yield:* +{round(st.session_state.daily_profit, 4)} USDT\n"
-                    f"👑 *TOTAL CUMULATIVE NETWORK PROFIT:* +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
-                    f"👉 *Register via my Direct Secure Link:* https://streamlit.app"
-                )
-                encoded_text = urllib.parse.quote(viral_text)
-                whatsapp_url = f"https://whatsapp.com{encoded_text}"
-                st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
+            daily_rate = (target / 100) * 2
+            projected_yield = capital * ((1 + daily_rate) ** days_count) if compound_active else capital + (capital * daily_rate * days_count)
+            
+            st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
+            st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
+            
+            viral_text = (
+                f"🚀 *NEXBOT AI v2.0 - TARGET POSITION HIT!* 🚀\n\n"
+                f"🔥 *Crypto Asset Node:* {coin_selected}\n"
+                f"🎯 *Price Target Boundaries:* ${p_start} ➡️ ${p_end} (🎯 Hit Successful!)\n"
+                f"📈 *Today's Cycle Yield:* +{round(st.session_state.daily_profit, 4)} USDT\n"
+                f"👑 *TOTAL CUMULATIVE NETWORK PROFIT:* +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
+                f"👉 *Register via my Direct Secure Link:* https://streamlit.app"
+            )
+            encoded_text = urllib.parse.quote(viral_text)
+            whatsapp_url = f"https://whatsapp.com{encoded_text}"
+            st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
 
     elif app_mode == "📜 Membership Ledger":
         st.markdown("## 📜 System Membership Ledger")
