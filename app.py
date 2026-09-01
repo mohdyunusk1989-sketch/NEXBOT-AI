@@ -1,8 +1,8 @@
 import streamlit as st
 import urllib.parse
 
-# Premium UI Config - Force ultra-wide layout to align all 6 columns beautifully in a single line
-st.set_page_config(page_title="NexBot AI - Institutional Elite v4.7", page_icon="🤖", layout="wide")
+# Premium UI Config - Force wide layout to fit columns beautifully
+st.set_page_config(page_title="NexBot AI - Institutional Elite v4.8", page_icon="🤖", layout="wide")
 
 # Simulation asset registry configuration
 binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT"]
@@ -37,14 +37,14 @@ if not st.session_state.authenticated:
         else:
             st.error("❌ INVALID UN-ENFORCED ACCESS PIN! ACCESS STRICTLY DENIED!")
 
-# --- 🤖 MAIN OPERATIONAL DASHBOARD (ROYAL Q PERFECT INLINE GRID) ---
+# --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
     app_mode = st.sidebar.selectbox("Navigation", ["🤖 Trading Core Suite", "📜 Membership Ledger"])
     
     if app_mode == "🤖 Trading Core Suite":
         # Header Dynamic Ribbon
-        head_col1, head_col2 = st.columns([4, 1])
+        head_col1, head_col2 = st.columns(2)
         with head_col1:
             st.markdown("<h2 style='color: #00E5FF; margin:0px;'>🤖 NEXBOT AI v3.2</h2>", unsafe_allow_html=True)
             st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE LIVE NETWORK SUITE & CUSTOM GRID MATRIX</p>", unsafe_allow_html=True)
@@ -53,44 +53,40 @@ else:
         
         st.divider()
 
-        # 📊 NEW MATRIX HEADING AT THE TOP (AS REQUESTED BY YUNUS BHAI)
+        # 📊 HEADING AT THE TOP
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 THE HORIZONTAL 6-COLUMN GRID MATRIX
-        # All upper red-line text labels deleted. Titles moved completely inside as fading placeholders!
+        # 👑 THE HORIZONTAL 6-COLUMN GRID MATRIX WITH LABELS ABOVE BOXES
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         
         with col1:
-            # Placeholder text disappears instantly when user types value
-            usdt_val = st.text_input("Capital Amount", placeholder="Capital (USDT)", key="grid_usdt", label_visibility="collapsed")
-            days_input = st.text_input("Target Days", placeholder="Target Days (e.g. 365)", key="grid_days", label_visibility="collapsed")
+            usdt_val = st.text_input("Capital (USDT)", value="10", key="grid_usdt")
+            days_input = st.text_input("Target Days", value="365", key="grid_days")
             
         with col2:
-            target_val = st.text_input("Daily Ratio %", placeholder="Daily Profit % (e.g. 0.5)", key="grid_target", label_visibility="collapsed")
+            target_val = st.text_input("Daily Profit %", value="0.5", key="grid_target")
             compound_active = st.checkbox("Auto-Compounding", value=True, key="grid_comp")
             
         with col3:
-            # Dropdowns don't support placeholders, so we keep the native clean text selector inside
-            coin_selected = st.selectbox("Select Crypto Token", options=binance_all_coins, index=0, key="grid_coin", label_visibility="collapsed")
+            coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="grid_coin")
             
         with col4:
-            price_from = st.text_input("Current Entry Price", placeholder="Current Entry Price", key="grid_p_from", label_visibility="collapsed")
+            price_from = st.text_input("Current Entry Price", value="3000", key="grid_p_from")
             
         with col5:
-            price_to = st.text_input("Target Exit Price", placeholder="Target Exit Price", key="grid_p_to", label_visibility="collapsed")
+            price_to = st.text_input("Target Hit Price", value="3500", key="grid_p_to")
             
         with col6:
-            margin_in = st.selectbox("Margin Call Limit", options=[f"Margin Calls: {i}" for i in range(1, 11)], index=6, key="grid_margin", label_visibility="collapsed")
+            margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="grid_margin")
 
-        # ⚡ NEW 'ENTER' FULL-WIDTH ACTION BUTTON AT THE VERY BOTTOM (NO SCROLL REQUIRED)
-        st.write("") # Micro spacer
+        # ⚡ ACTION BUTTON AT THE VERY BOTTOM
+        st.write("") 
         launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="grid_enter_btn")
 
         st.divider()
 
         # Calculation dispatch triggers
         if launch_action:
-            # Safeguard input check to prevent mathematical parsing crash
             val_capital = float(usdt_val) if usdt_val else 10.0
             val_target = float(target_val) if target_val else 0.5
             
