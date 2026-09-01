@@ -1,29 +1,30 @@
 import streamlit as st
 import urllib.parse
 
-# Ultra-Wide Layout Configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v5.1", page_icon="🤖", layout="wide")
+# Page configuration
+st.set_page_config(page_title="NexBot AI - Institutional Elite v5.2", page_icon="🤖", layout="wide")
 
-# Custom CSS injection to ensure all 7 boxes remain perfectly aligned horizontally
+# Force Table Alignment Style to fix any column stretching or wrapping issues completely
 st.markdown("""
     <style>
-    div[data-testid="stHorizontalBlock"] {
-        align-items: flex-end !important;
-        gap: 8px !important;
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
     }
-    div[data-testid="stColumn"] {
-        min-width: 100px !important;
+    div[data-testid="stBlock"] {
+        margin-bottom: -15px !important;
     }
-    .stTextInput input {
+    .stTextInput input, .stSelectbox div {
         text-align: center !important;
+        font-weight: bold !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# Assets Registry
+# Cryptocurrencies list
 binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT"]
 
-# Session State Storage Initializations
+# Session State Initializations
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "owner_income" not in st.session_state:
@@ -60,48 +61,49 @@ else:
     
     if app_mode == "🤖 Trading Core Suite":
         # Header Dynamic Ribbon
-        head_col1, head_col2 = st.columns(2)
+        head_col1, head_col2 = st.columns([4, 1])
         with head_col1:
             st.markdown("<h2 style='color: #00E5FF; margin:0px;'>🤖 NEXBOT AI v3.2</h2>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE LIVE NETWORK SUITE & CUSTOM GRID MATRIX</p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE LIVE NETWORK SUITE & CUSTOM FIXED GRID</p>", unsafe_allow_html=True)
         with head_col2:
             st.markdown(f"<div style='background-color:#2D1A38; padding:8px; border-radius:5px; text-align:center; font-size:12px; font-weight:bold; color:#E040FB; margin-top:5px;'>👑 Vault: {round(st.session_state.owner_income, 2)} USDT</div>", unsafe_allow_html=True)
         
         st.divider()
 
-        st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #FFB300; margin-bottom: 5px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 THE HORIZONTAL 7-COLUMN INLINE GRID (PROPORTIONAL SIZING PACKED IN ONE LINE)
-        col1, col2, col3, col4, col5, col6, col7 = st.columns([1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.3])
+        # 👑 FIXED HORIZONTAL TABLE LAYOUT MATRIX: Eliminates wrapping completely!
+        # Allocating exact side-by-side spacing structure
+        row_cols = st.columns([1, 1, 1, 1, 1, 1, 1.2])
         
-        with col1:
-            usdt_val = st.text_input("Capital (USDT)", value="10", key="grid_usdt")
-            days_input = st.text_input("Target Days Limit", value="365", key="grid_days")
+        with row_cols[0]:
+            usdt_val = st.text_input("Capital (USDT)", value="10", key="f_usdt")
+            days_input = st.text_input("Target Days Limit", value="365", key="f_days")
             
-        with col2:
-            target_val = st.text_input("Daily Ratio %", value="0.5", key="grid_target")
-            compound_active = st.checkbox("Auto-Compounding", value=True, key="grid_comp")
+        with row_cols[1]:
+            target_val = st.text_input("Daily Ratio %", value="0.5", key="f_target")
+            compound_active = st.checkbox("Auto-Compound", value=True, key="f_comp")
             
-        with col3:
-            coin_selected = st.selectbox("Crypto Asset Token", options=binance_all_coins, index=0, key="grid_coin")
+        with row_cols[2]:
+            coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
             
-        with col4:
-            price_from = st.text_input("Current Entry Price", value="3000", key="grid_p_from")
+        with row_cols[3]:
+            price_from = st.text_input("Current Entry Price", value="3000", key="f_p_from")
             
-        with col5:
-            price_to = st.text_input("Target Hit Price", value="3500", key="grid_p_to")
+        with row_cols[4]:
+            price_to = st.text_input("Target Hit Price", value="3500", key="f_p_to")
             
-        with col6:
-            margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="grid_margin")
+        with row_cols[5]:
+            margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
             
-        with col7:
-            # ✅ RE-POSITIONED TO THE VERY END (COLUMN 7): Shows the real-time profit automatically on calculate!
-            profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.show_success else "0.0 USDT"
-            st.text_input("🎯 Profit (USDT)", value=profit_display_value, disabled=True, key="grid_profit_auto")
+        with row_cols[6]:
+            # ✅ ABSOLUTE DYNAMIC VALUE INJECTION: Instantly updates field upon clicking the action switch!
+            profit_box_text = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.show_success else "0.0 USDT"
+            st.text_input("Profit (USDT)", value=profit_box_text, key="f_profit_output")
 
         # ⚡ ACTION ROW DIRECTLY BELOW COLUMNS
         st.write("") 
-        launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="grid_enter_btn")
+        launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="f_submit_btn")
 
         st.divider()
 
