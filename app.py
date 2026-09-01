@@ -25,9 +25,11 @@ if "owner_income" not in st.session_state:
 if "fuel_wallet" not in st.session_state:
     st.session_state.fuel_wallet = 10.0
 if "total_profit" not in st.session_state:
-    st.session_state.total_profit = 248.50  # 📈 Simulated starting Cumulative Total for viral marketing punch
+    st.session_state.total_profit = 248.50  # Simulated Cumulative Total for marketing
 if "daily_profit" not in st.session_state:
     st.session_state.daily_profit = 0.0
+if "show_success" not in st.session_state:
+    st.session_state.show_success = False
 
 MASTER_PIN = "8312"
 
@@ -67,8 +69,6 @@ else:
         st.markdown("### 💳 Account Balances & Metrics:")
         st.markdown("<span style='color: #00E676;'>📜 1-Year Membership: ACTIVE ✅ (25 USDT Plan)</span>", unsafe_allow_html=True)
         st.write(f"⛽ Independent Fuel Wallet: {round(st.session_state.fuel_wallet, 4)} USDT")
-        
-        # ✅ USER SCREEN: Shows only Daily Profit to the user inside their app!
         st.write(f"💰 Today's Daily Profit: {round(st.session_state.daily_profit, 4)} USDT")
         st.divider()
 
@@ -86,19 +86,24 @@ else:
             capital = float(usdt_val)
             target = float(target_val)
             
-            live_price = 61500.00
-            target_hit_price = live_price * (1 + (target / 100))
-            
-            # Mathematical Processing
+            # Processing Logic
             current_cycle_profit = capital * (target / 100)
             st.session_state.daily_profit = current_cycle_profit
             st.session_state.total_profit += current_cycle_profit
             st.session_state.fuel_wallet -= (current_cycle_profit * 0.05)
             st.session_state.owner_income += 15.0
-            
+            st.session_state.show_success = True
+            st.rerun()
+
+        # ✅ FIXED DISPLAY LOOP: Keeps the WhatsApp button permanently visible on click!
+        if st.session_state.show_success:
+            capital = float(usdt_val)
+            target = float(target_val)
+            live_price = 61500.00
+            target_hit_price = live_price * (1 + (target / 100))
             prob = "99.42%" if target <= 0.5 else "94.15%" if target <= 1.0 else "74.80%"
             
-            st.success(f"🎉 CONGRATULATION! TARGET HIT! 🎉\n\n📈 Asset Executed: {coin_selected}\n💰 Today's Profit: +{round(current_cycle_profit, 4)} USDT")
+            st.success(f"🎉 CONGRATULATION! TARGET HIT! 🎉\n\n📈 Asset Executed: {coin_selected}\n💰 Today's Profit: +{round(st.session_state.daily_profit, 4)} USDT")
             
             daily_rate = (target / 100) * 2
             m_yield = capital * ((1 + daily_rate) ** 30) if compound_active else capital + (capital * daily_rate * 30)
@@ -108,7 +113,6 @@ else:
             st.code(f"🏁 Target boundaries: ${live_price} - ${round(target_hit_price, 2)}\n🗓️ 1-Month Projections: {round(m_yield, 2)} USDT\n👑 1-Year Total Yield: {round(y_yield, 2)} USDT")
 
             # --- 🚀 VIRAL TEXT MARKETING GENERATION ENGINE (TOTAL PROFITS BLAST) ---
-            # ✅ WHATSAPP TEXT: Displays the massive Cumulative Total Profit to drive users crazy!
             viral_text = (
                 f"🚀 *NEXBOT AI v2.0 - STRATEGY TARGET HIT!* 🚀\n\n"
                 f"🔥 *Active Asset:* {coin_selected}\n"
@@ -116,13 +120,12 @@ else:
                 f"🎯 *AI Success Probability:* {prob}\n"
                 f"👑 *TOTAL CUMULATIVE PROFIT:* +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
                 f"💸 My automated passive revenue matrix is booming! Stop wasting time and lock your node now!\n"
-                f"👉 *Register via my Direct Secure Link:* https://streamlit.io"
+                f"👉 *Register via my Direct Secure Link:* https://streamlit.app"
             )
             encoded_text = urllib.parse.quote(viral_text)
             whatsapp_url = f"https://whatsapp.com{encoded_text}"
             
             st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
-            st.rerun()
             
     elif app_mode == "📜 Membership Ledger":
         st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger</h2>", unsafe_allow_html=True)
