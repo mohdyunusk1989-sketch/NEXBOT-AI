@@ -1,10 +1,23 @@
 import streamlit as st
 import urllib.parse
 
-# Premium UI Config - Force ultra-wide layout to align all columns beautifully in a single line
-st.set_page_config(page_title="NexBot AI - Institutional Elite v4.9", page_icon="🤖", layout="wide")
+# Force Ultra-Wide Layout with Custom CSS for perfect 1-line alignment
+st.set_page_config(page_title="NexBot AI - Institutional Elite v5.0", page_icon="🤖", layout="wide")
 
-# Simulation asset registry configuration
+# Custom CSS injection to prevent any column wrapping or vertical stacking
+st.markdown("""
+    <style>
+    [data-testid="stHorizontalBlock"] {
+        align-items: flex-end !important;
+        gap: 10px !important;
+    }
+    div[data-testid="stColumn"] {
+        min-width: 120px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Assets Registry Config
 binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT"]
 
 # Session State Storage Initializations
@@ -39,7 +52,7 @@ if not st.session_state.authenticated:
         else:
             st.error("❌ INVALID UN-ENFORCED ACCESS PIN! ACCESS STRICTLY DENIED!")
 
-# --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD (GRID ARCHITECTURE) ---
+# --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
     app_mode = st.sidebar.selectbox("Navigation", ["🤖 Trading Core Suite", "📜 Membership Ledger"])
@@ -55,11 +68,10 @@ else:
         
         st.divider()
 
-        # 📊 HEADING AT THE TOP
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 THE ULTRA-COMPACT CALCULATION GRID (ALL LABELS FIXED SECURELY ABOVE BOXES)
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+        # 👑 THE HORIZONTAL 7-COLUMN INLINE GRID (PROPORTIONAL SIZING PACKED IN ONE LINE)
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([1.1, 1.1, 1.2, 1.1, 1.1, 1.1, 1.1])
         
         with col1:
             usdt_val = st.text_input("Capital (USDT)", value="10", key="grid_usdt")
@@ -70,7 +82,7 @@ else:
             compound_active = st.checkbox("Auto-Compounding", value=True, key="grid_comp")
             
         with col3:
-            # ✅ NEW CUSTOM EXTRA BOX: Target Profit Option directly in USD for the user!
+            # ✅ PROFIT OPTION IN USDT ACCURATELY PLACED
             profit_usd_val = st.text_input("Target Profit (USDT)", value="5.0", key="grid_profit_usd")
             
         with col4:
@@ -85,13 +97,12 @@ else:
         with col7:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="grid_margin")
 
-        # ⚡ ACTIONS AND EXECUTION BAR AT THE BOTTOM
+        # ⚡ ACTION ACTION ROW DIRECTLY BELOW COLUMNS
         st.write("") 
         launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="grid_enter_btn")
 
         st.divider()
 
-        # Calculation processor triggered on Action Button Click
         if launch_action:
             val_capital = float(usdt_val) if usdt_val else 10.0
             val_target = float(target_val) if target_val else 0.5
@@ -100,7 +111,6 @@ else:
             st.session_state.daily_profit = val_capital * (val_target / 100)
             st.session_state.target_profit_usd = val_profit_usd
             st.session_state.total_profit += st.session_state.daily_profit
-            st.session_state.fuel_wallet -= (st.session_state.daily_profit * 0.05)
             st.session_state.owner_income += 15.0
             st.session_state.show_success = True
 
@@ -127,14 +137,12 @@ else:
                 )
             
             with box_col2:
-                # Math Compounding Projection Block
                 daily_rate = (target / 100) * 2
                 projected_yield = capital * ((1 + daily_rate) ** days_count) if compound_active else capital + (capital * daily_rate * days_count)
                 
                 st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
                 st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
                 
-                # Viral Marketing text dispatch structure
                 viral_text = (
                     f"🚀 *NEXBOT AI v2.0 - TARGET POSITION HIT!* 🚀\n\n"
                     f"🔥 *Crypto Asset Node:* {coin_selected}\n"
