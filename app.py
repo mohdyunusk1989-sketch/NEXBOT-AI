@@ -1,130 +1,120 @@
-import flet as ft
+import streamlit as st
+import urllib.parse
 
-def main(page: ft.Page):
-    page.title = "NexBot AI - Institutional Elite v2.0"
-    page.window.width = 500
-    page.window.height = 880
-    page.theme_mode = ft.ThemeMode.DARK
-    page.scroll = ft.ScrollMode.AUTO
-    page.padding = 20
+# Page Layout Configurations
+st.set_page_config(page_title="NexBot AI - Institutional Elite v3.2", page_icon="🤖", layout="centered")
 
-    # --- DATABASES & STATS VARIABLES (REAL-TIME TRACKERS) ---
-    app_owner_income = 15.0      # 25 Plan fee - 10 referral = 15 USDT to Owner
-    user_fuel_wallet = 10.0      # Independent Fuel Recharge Wallet
-    total_accumulated_profit = 0.0  # Cumulative Total Profit Tracker
+# --- 🏦 LIVE DATA SIMULATION FOR HARDCORE API SYNC ---
+binance_all_coins = [
+    "BTC/USDT", "ETH/USDT", "SOL/USDT", "XRP/USDT", "ADA/USDT", 
+    "DOGE/USDT", "DOT/USDT", "SHIB/USDT", "AVAX/USDT", "LINK/USDT",
+    "MATIC/USDT", "BNB/USDT", "TRX/USDT", "LTC/USDT", "NEAR/USDT"
+]
+
+binance_live_hit_list = [
+    {"coin": "🔥 SOL/USDT", "gain": "+12.45%", "status": "Strong Bullish 🚀"},
+    {"coin": "🔥 NEAR/USDT", "gain": "+9.12%", "status": "Target Boundary Break ⚡"},
+    {"coin": "🔥 DOGE/USDT", "gain": "+7.84%", "status": "High Volume Surge 📈"}
+]
+
+# Session State Initializations
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "owner_income" not in st.session_state:
+    st.session_state.owner_income = 0.0
+if "fuel_wallet" not in st.session_state:
+    st.session_state.fuel_wallet = 10.0
+if "total_profit" not in st.session_state:
+    st.session_state.total_profit = 0.0
+
+MASTER_PIN = "8312"
+
+# --- 🔒 SECURITY GATEWAY TERMINAL VIEW ---
+if not st.session_state.authenticated:
+    st.markdown("<h2 style='text-align: center; color: #FF1744;'>🔒 SECURITY GATEWAY ACTIVE</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #8B949E;'>NEXBOT PRIVATE ENCRYPTED NODE VERIFICATION</p>", unsafe_allow_html=True)
     
-    trade_history_logs = [
-        "🗓️ 2026-08-25: SOL/USDT Target Hit ➡️ +0.10 USDT",
-        "🗓️ 2026-08-26: BTC/USDT Target Hit ➡️ +0.12 USDT"
-    ]
-
-    # --- UI COMPONENT CONTROLS (30 OPTIONS INTEGRATION MATRIX) ---
-    usdt_input = ft.TextField(label="1. First Buy Amount (USDT)", value="10", prefix_icon=ft.icons.MONETIZATION_ON, border_color="#00E5FF", width=420)
-    target_input = ft.TextField(label="2. Custom Target Profit % (No Limit)", value="0.5", prefix_icon=ft.icons.ADJUST, border_color="#00E5FF", width=420)
+    # Secure Password Field
+    pin_input = st.text_input("Enter Enforced Security PIN to Unlock Network", type="password", key="pin_gate")
     
-    stop_loss_switch = ft.Switch(label="3. Enable Intelligent Stop-Loss", value=False, active_color="#FF3D00")
-    stop_loss_val = ft.TextField(label="4. Stop-Loss Percentage Limit (%)", value="5.0", width=420, visible=False)
+    if st.button("AUTHORIZE ACCESS LOCK ✅", use_container_width=True):
+        if pin_input == MASTER_PIN:
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("❌ INVALID UN-ENFORCED ACCESS PIN! ACCESS STRICTLY DENIED!")
+
+# --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
+else:
+    st.markdown("<h1 style='color: #00E5FF;'>🤖 NEXBOT AI v3.2</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #8B949E; font-size: 11px;'>BINANCE LIVE NETWORK SUITE & GAINERS LEDGER</p>", unsafe_allow_html=True)
+    st.divider()
+
+    # 👑 Branded Owner Revenue Vault Container Inside Core Framework View
+    st.info(f"👑 Confidential Owner Income Vault: {round(st.session_state.owner_income, 2)} USDT")
+
+    # 🔥 Binance Live Coin Hit List Display Panel Layout
+    st.markdown("### 🔥 BINANCE LIVE COIN HIT LIST (Top Gainers)")
+    for item in binance_live_hit_list:
+        st.markdown(f"**{item['coin']}** | <span style='color: #00E676;'>{item['gain']}</span> | *{item['status']}*", unsafe_allow_html=True)
+    st.divider()
+
+    # 💳 Account Balances & Metrics Layout View
+    st.markdown("### 💳 Account Balances & Metrics:")
+    st.markdown("<span style='color: #00E676;'>📜 1-Year Membership: ACTIVE ✅ (25 USDT Plan)</span>", unsafe_allow_html=True)
+    st.write(f"⛽ Independent Fuel Wallet: {round(st.session_state.fuel_wallet, 4)} USDT")
+    st.write(f"💰 Total Cumulative Profit: {round(st.session_state.total_profit, 4)} USDT")
+    st.divider()
+
+    # ⚙️ Strategy Configuration Controls Layout Panel
+    st.markdown("### ⚙️ Strategy Configuration Controls (30 Options):")
+    usdt_val = st.text_input("1. First Buy Amount (USDT)", value="10", key="usdt_in")
+    target_val = st.text_input("2. Custom Target Profit % (No Limit)", value="0.5", key="target_in")
     
-    margin_call_limit = ft.Dropdown(label="5. Max Margin Call Limit", value="7", width=420, options=[ft.dropdown.Option(str(i)) for i in range(1, 11)])
-    dca_drop_1 = ft.TextField(label="6. 1st Margin Call Drop %", value="1.1", width=420)
-    coin_pair = ft.Dropdown(label="7. Active Asset Tracker", value="SOL/USDT", width=420, options=[ft.dropdown.Option("SOL/USDT"), ft.dropdown.Option("BTC/USDT"), ft.dropdown.Option("ETH/USDT")])
-    compound_switch = ft.Switch(label="8. Auto-Compounding Mode", value=True, active_color="#00E676")
+    stop_loss_active = st.checkbox("3. Enable Intelligent Stop-Loss", value=False)
+    if stop_loss_active:
+        st.text_input("4. Stop-Loss Percentage Limit (%)", value="5.0", key="sl_in")
+        
+    st.selectbox("5. Max Margin Call Limit", options=[str(i) for i in range(1, 11)], index=6, key="margin_in")
+    st.text_input("6. 1st Margin Call Drop %", value="1.1", key="dca_in")
+    coin_selected = st.selectbox("7. Active Asset Tracker (Binance Live Sync ✅)", options=binance_all_coins, index=2, key="coin_in")
+    compound_active = st.checkbox("8. Auto-Compounding Mode", value=True)
 
-    # --- INDEPENDENT FUEL & TOTAL PROFIT PANEL DISPLAY ---
-    fuel_status_txt = ft.Text(f"⛽ Independent Fuel Wallet: {user_fuel_wallet} USDT", color="#FFB300", size=14, weight=ft.FontWeight.W_600)
-    cumulative_profit_txt = ft.Text("💰 Total Cumulative Profit: 0.00 USDT", color="#00E5FF", size=18, weight=ft.FontWeight.BOLD)
-    
-    congratulation_banner = ft.Container(visible=False, padding=15, border_radius=12, bgcolor="#004D40", border=ft.border.all(2, "#00E676"))
-    congrat_txt = ft.Text("", size=16, weight=ft.FontWeight.BOLD, color="#FFFFFF")
-    
-    calculator_panel = ft.Container(visible=False, padding=15, border_radius=12, bgcolor="#111a24", border=ft.border.all(1, "#30363d"))
-    hit_rate_txt = ft.Text("", size=15, weight=ft.FontWeight.BOLD, color="#FFD700")
-    projections_txt = ft.Text("", size=13, color="#E0E0E0")
-
-    history_panel = ft.Column([ft.Text("📋 Daily Trading History Ledger:", size=14, weight=ft.FontWeight.BOLD, color="#B0BEC5")])
-    for log in trade_history_logs:
-        history_panel.controls.append(ft.Text(log, size=13, color="#FFFFFF"))
-
-    def toggle_stop_loss(e):
-        stop_loss_val.visible = stop_loss_switch.value
-        page.update()
-    stop_loss_switch.on_change = toggle_stop_loss
-
-    def execute_nexbot_v2(e):
-        nonlocal total_accumulated_profit, user_fuel_wallet
-        capital = float(usdt_input.value)
-        target = float(target_input.value)
+    # ⚠️ LAUNCH ENGINE TRIGGER CONFIG
+    if st.button("LAUNCH STRATEGY ENGINE & CALCULATE", type="primary", use_container_width=True, key="launch_btn"):
+        capital = float(usdt_val)
+        target = float(target_val)
         
         live_price = 61500.00
         target_hit_price = live_price * (1 + (target / 100))
         current_cycle_profit = capital * (target / 100)
         
-        fuel_deduction = current_cycle_profit * 0.05
-        user_fuel_wallet -= fuel_deduction
-        total_accumulated_profit += current_cycle_profit
+        st.session_state.fuel_wallet -= (current_cycle_profit * 0.05)
+        st.session_state.total_profit += current_cycle_profit
+        st.session_state.owner_income += 15.0
         
-        if target <= 0.5: prob = "99.42%"
-        elif target <= 1.0: prob = "94.15%"
-        else: prob = "74.80%"
-
-        fuel_status_txt.value = f"⛽ Independent Fuel Wallet: {round(user_fuel_wallet, 4)} USDT"
-        cumulative_profit_txt.value = f"💰 Total Cumulative Profit: {round(total_accumulated_profit, 4)} USDT"
+        prob = "99.42%" if target <= 0.5 else "94.15%" if target <= 1.0 else "74.80%"
         
-        congrat_txt.value = (
-            f"🎉 CONGRATULATION! TARGET HIT! 🎉\n"
-            f"-----------------------------------------\n"
-            f"📈 Asset Executed: {coin_pair.value}\n"
-            f"💰 Today's Profit: +{round(current_cycle_profit, 4)} USDT\n"
-            f"👑 TOTAL ACCUMULATED PROFIT: {round(total_accumulated_profit, 4)} USDT 🔥\n"
-            f"👉 Join NexBot AI v2.0 using my Referral Code!"
-        )
-        congratulation_banner.visible = True
+        st.success(f"🎉 CONGRATULATION! TARGET HIT! 🎉\n\n📈 Asset Executed: {coin_selected}\n💰 Today's Profit: +{round(current_cycle_profit, 4)} USDT")
         
         daily_rate = (target / 100) * 2
-        if compound_switch.value:
-            m_yield = capital * ((1 + daily_rate) ** 30)
-            y_yield = capital * ((1 + daily_yield) ** 365)
-        else:
-            m_yield = capital + (capital * daily_rate * 30)
-            y_yield = capital + (capital * daily_yield * 365)
-            
-        hit_rate_txt.value = f"🎯 AI Strategy Hit Probability: {prob} SUCCESS RATE"
-        projections_txt.value = (
-            f"🏁 Target Reference Boundaries: ${live_price} - ${round(target_hit_price, 2)}\n"
-            f"🗓️ 1-Month (30 Days) Projective Yield: {round(m_yield, 2)} USDT\n"
-            f"👑 1-Year (365 Days) Macro Matrix Total: {round(y_yield, 2)} USDT"
+        m_yield = capital * ((1 + daily_rate) ** 30) if compound_active else capital + (capital * daily_rate * 30)
+        y_yield = capital * ((1 + daily_rate) ** 365) if compound_active else capital + (capital * daily_rate * 365)
+
+        st.markdown(f"🎯 **AI Strategy Hit Probability:** {prob} SUCCESS RATE")
+        st.code(f"🏁 Target boundaries: ${live_price} - ${round(target_hit_price, 2)}\n🗓️ 1-Month Projections: {round(m_yield, 2)} USDT\n👑 1-Year Total Yield: {round(y_yield, 2)} USDT")
+
+        # --- 🚀 VIRAL TEXT GENERATION ENGINE ---
+        viral_text = (
+            f"🚀 *NEXBOT AI v2.0 - BINANCE STRATEGY HIT!* 🚀\n\n"
+            f"🔥 *Asset Token:* {coin_selected}\n"
+            f"💰 *Today's Profit:* +{round(current_cycle_profit, 4)} USDT\n"
+            f"🎯 *Strategy Hit Probability:* {prob}\n"
+            f"📈 *Total Cumulative Profit:* {round(st.session_state.total_profit, 4)} USDT\n\n"
+            f"👑 Join my Elite Trading Network Securely!\n"
+            f"👉 *Register via my Referral link:* https://streamlit.io"
         )
-        calculator_panel.visible = True
-        page.update()
-
-    congratulation_banner.content = congrat_txt
-    calculator_panel.content = ft.Column([hit_rate_txt, projections_txt])
-
-    page.add(
-        ft.Text("🤖 NEXBOT AI v2.0", size=32, weight=ft.FontWeight.BOLD, color="#00E5FF"),
-        ft.Text("QUANTUM DUAL-WALLET SUITE & REVENUE LEDGER", size=10, color="#8B949E", weight=ft.FontWeight.W_600),
-        ft.Divider(color="#21262d"),
-        ft.Text("💳 Account Balances & Metrics:", size=15, weight=ft.FontWeight.BOLD, color="#FFB300"),
-        ft.Text("📜 1-Year Membership: ACTIVE ✅ (25 USDT Plan)", color="#00E676", size=13),
-        fuel_status_txt,
-        cumulative_profit_txt,
-        ft.Divider(color="#21262d"),
-        ft.Text("⚙️ Strategy Configuration Controls (30 Options):", size=15, weight=ft.FontWeight.BOLD, color="#FFB300"),
-        usdt_input, target_input, stop_loss_switch, stop_loss_val, margin_call_limit, dca_drop_1, coin_pair,
-        ft.Container(content=compound_switch, padding=ft.padding.only(bottom=15)),
-        ft.ElevatedButton(
-            "LAUNCH STRATEGY ENGINE & CALCULATE", 
-            on_press=execute_nexbot_v2, 
-            bgcolor="#00E676", color="#000000",
-            width=420, height=50,
-            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=8))
-        ),
-        ft.Divider(color="#21262d"),
-        congratulation_banner,
-        ft.Container(height=5),
-        calculator_panel,
-        ft.Divider(color="#21262d"),
-        history_panel
-    )
-
-ft.app(target=main)
+        encoded_text = urllib.parse.quote(viral_text)
+        whatsapp_url = f"https://whatsapp.com{encoded_text}"
+        
+        st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
