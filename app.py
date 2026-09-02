@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v5.9", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v6.0", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -54,6 +54,7 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
+    # ✅ ALL 3 ORIGINAL PAGES RESTORED PERFECTLY
     app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"])
     
     if app_mode == "🤖 Trading Core Suite":
@@ -69,30 +70,30 @@ else:
 
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 LINE 1: THE UPPER 4 BOXES ROW
-        up_cols = st.columns(4)
-        with up_cols:
+        # 👑 LINE 1: THE UPPER 4 BOXES ROW (CLEAN DIRECT STRUCTURING)
+        uc1, uc2, uc3, uc4 = st.columns(4)
+        with uc1:
             usdt_val = st.text_input("Capital (USDT)", value="30", key="f_usdt")
-        with up_cols:
+        with uc2:
             days_input = st.text_input("Target Days Limit", value="365", key="f_days")
-        with up_cols:
+        with uc3:
             target_val = st.text_input("Daily Ratio %", value="0.5", key="f_target")
-        with up_cols:
+        with uc4:
             coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
             
         st.write("") # Micro layout spacer
 
         # 👑 LINE 2: THE LOWER 4 BOXES ROW (4TH BOX IS THE AUTOMATIC PROFIT HIT OPTION)
-        down_cols = st.columns(4)
-        with down_cols:
+        dc1, dc2, dc3, dc4 = st.columns(4)
+        with dc1:
             price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
-        with down_cols:
+        with dc2:
             price_to = st.text_input("Target Hit Price", value="5000", key="f_p_to")
             compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
-        with down_cols:
+        with dc3:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
-        with down_cols:
-            # ✅ ABSOLUTE SOLUTION: Tied values directly to session memory so it locks perfectly without freezing!
+        with dc4:
+            # ✅ AUTOMATIC CALCULATION TARGET PROFIT BOX PLACED EXACTLY BELOW THE UPPER 4 BOXES
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
             st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed")
 
