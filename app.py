@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v5.8", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v5.9", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -54,7 +54,6 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
-    # ✅ ALL 3 ORIGINAL PAGES RESTORED PERFECTLY
     app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"])
     
     if app_mode == "🤖 Trading Core Suite":
@@ -70,32 +69,32 @@ else:
 
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 FIXED LAYOUT: 4 Upper Boxes Row (Correct Index Placement)
+        # 👑 LINE 1: THE UPPER 4 BOXES ROW
         up_cols = st.columns(4)
-        with up_cols[0]:
-            usdt_val = st.text_input("Capital (USDT)", value="10", key="f_usdt")
-        with up_cols[1]:
+        with up_cols:
+            usdt_val = st.text_input("Capital (USDT)", value="30", key="f_usdt")
+        with up_cols:
             days_input = st.text_input("Target Days Limit", value="365", key="f_days")
-        with up_cols[2]:
+        with up_cols:
             target_val = st.text_input("Daily Ratio %", value="0.5", key="f_target")
-        with up_cols[3]:
+        with up_cols:
             coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
             
         st.write("") # Micro layout spacer
 
-        # 👑 FIXED LAYOUT: 4 Lower Boxes Row (4th box is Target Profit Hit Box)
+        # 👑 LINE 2: THE LOWER 4 BOXES ROW (4TH BOX IS THE AUTOMATIC PROFIT HIT OPTION)
         down_cols = st.columns(4)
-        with down_cols[0]:
-            price_from = st.text_input("Current Entry Price", value="3000", key="f_p_from")
-        with down_cols[1]:
-            price_to = st.text_input("Target Hit Price", value="3500", key="f_p_to")
+        with down_cols:
+            price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
+        with down_cols:
+            price_to = st.text_input("Target Hit Price", value="5000", key="f_p_to")
             compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
-        with down_cols[2]:
+        with down_cols:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
-        with down_cols[3]:
-            # ✅ AUTOMATIC CALCULATION TARGET PROFIT BOX PLACED EXACTLY BELOW THE UPPER 4 BOXES
-            profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.show_success else "0.0 USDT"
-            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output")
+        with down_cols:
+            # ✅ ABSOLUTE SOLUTION: Tied values directly to session memory so it locks perfectly without freezing!
+            profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
+            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed")
 
         # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW BOTH LINES
         st.write("") 
@@ -104,7 +103,7 @@ else:
         st.divider()
 
         if launch_action:
-            val_capital = float(usdt_val) if usdt_val else 10.0
+            val_capital = float(usdt_val) if usdt_val else 30.0
             val_target = float(target_val) if target_val else 0.5
             
             st.session_state.daily_profit = val_capital * (val_target / 100)
@@ -115,12 +114,12 @@ else:
             st.rerun()
 
         # Summary Display Box Layer
-        if st.session_state.show_success:
-            capital = float(usdt_val) if usdt_val else 10.0
+        if st.session_state.show_success or st.session_state.daily_profit > 0:
+            capital = float(usdt_val) if usdt_val else 30.0
             target = float(target_val) if target_val else 0.5
             days_count = int(days_input) if days_input else 365
-            p_start = float(price_from) if price_from else 3000.0
-            p_end = float(price_to) if price_to else 3500.0
+            p_start = float(price_from) if price_from else 4000.0
+            p_end = float(price_to) if price_to else 5000.0
             
             st.markdown("### 📊 Live Network Strategy Summary Box Matrix")
             
