@@ -2,21 +2,10 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v7.0", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v7.1", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
-st.markdown("""
-    <style>
-    .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 1.5rem !important;
-    }
-    .stTextInput input, .stSelectbox div {
-        text-align: center !important;
-        font-weight: bold !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+st.markdown("<style>.block-container {padding-top: 1.5rem !important; padding-bottom: 1.5rem !important;} .stTextInput input, .stSelectbox div {text-align: center !important; font-weight: bold !important;}</style>", unsafe_allow_html=True)
 
 # Cryptocurrencies list
 binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT"]
@@ -86,8 +75,8 @@ else:
             price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
         with dc2:
             price_to = st.text_input("Target Hit Price", value="5000", key="f_p_to")
-            compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
         with dc3:
+            compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
@@ -106,6 +95,7 @@ else:
             st.session_state.total_profit += st.session_state.daily_profit
             st.session_state.fuel_wallet -= (st.session_state.daily_profit * 0.05)
             st.session_state.owner_income += 15.0
+            st.grid_profit_grid_output_fixed_final = f"{round(st.session_state.daily_profit, 4)} USDT"
             st.rerun()
 
         # Summary Display Box Layer
@@ -122,12 +112,7 @@ else:
             with box_col1:
                 st.info(f"💰 **Today's Daily Cycle Profit:** {round(st.session_state.daily_profit, 4)} USDT")
                 st.warning(f"⛽ **Independent Fuel Wallet Balance:** {round(st.session_state.fuel_wallet, 4)} USDT")
-                st.code(
-                    f"📦 Total Capital Allocated: {capital} USDT\n"
-                    f"🪙 Active Blockchain Asset: {coin_selected}\n"
-                    f"🎯 Position Hit Boundaries: From ${p_start} To ${p_end}\n"
-                    f"🛠️ Enforced Margin Parameters: {margin_in}"
-                )
+                st.code(f"📦 Total Capital Allocated: {capital} USDT\n🪙 Active Blockchain Asset: {coin_selected}\n🎯 Position Hit Boundaries: From ${p_start} To ${p_end}\n🛠️ Enforced Margin Parameters: {margin_in}")
             
             with box_col2:
                 daily_rate = (target / 100) * 2
@@ -166,7 +151,7 @@ else:
             st.write("🗓️ **Activation Date:** September 02, 2026")
             st.write("🛡️ **Enforced Security Node:** Private Firewall Safe")
 
-    # ⚙️ ADVANCED PARAMETERS PAGE 
+    # ⚙️ ADVANCED PARAMETERS PAGE
     elif app_mode == "⚙️ Advanced Parameters":
         st.markdown("<h2 style='color: #00E5FF;'>⚙️ Advanced Quantitative Strategy Parameters</h2>", unsafe_allow_html=True)
         st.markdown("<p style='color: #8B949E;'>ROYAL Q AUTOMATED HIGH-FREQUENCY DCA GRIDS</p>", unsafe_allow_html=True)
@@ -174,11 +159,4 @@ else:
         
         st.markdown("### 📊 Martingale Margin Call Settings Matrix (Pre-Configured Options)")
         st.warning("🤖 System execution logic is processing under Quantum Dual-Wallet Liquidity Node Framework.")
-        
-        # Displaying professional trading matrix table safely packed
-        st.markdown("""
-
-| Margin Call Level | Market Drop % Trigger | Multiplier Buy Ratio | Current Execution Target Style |
-| :--- | :--- | :--- | :--- |
-| **1st Call** | 1.1% Drop | 1x First Buy | Automatic Scalping 📈 |
-| **2nd Call** | 1.5% Drop | 2x First Buy | Smart Accumulation ⚡ |
+        st.code("1st Call: 1.1% Drop | Multiplier Buy Ratio: 1x First Buy\n2nd Call: 1.5% Drop | Multiplier Buy Ratio: 2x First Buy\n3rd Call: 2.0% Drop | Multiplier Buy Ratio: 4x First Buy\n4th Call: 2.5% Drop | Multiplier Buy Ratio: 8x First Buy\n5th to 10th Call: Dynamic Layer Optimization Matrix Activated")
