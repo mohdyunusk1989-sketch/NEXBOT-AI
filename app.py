@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v9.5", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v9.6", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -63,11 +63,11 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### Compass NexBot Control Menu")
-    # ✅ ALL ORIGINAL PAGES RESTORED AND 30-OPTION ASSIGNED AS AN INDEPENDENT ADVANCED MODULE PAGE
-    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "📊 30-Layer Martingale Grid"], key="master_router_final_v95")
+    # ✅ RENAMED & UPDATED ARCHITECTURE AS REQUESTED
+    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "🎛️ Royal Q Quant Settings"], key="master_router_final_v96")
     
     # ----------------------------------------------------
-    # 👑 PAGE 1: TRADING CORE SUITE (RESTORED COMPLETELY TO ORIGINAL CALCULATOR LOOK)
+    # 👑 PAGE 1: TRADING CORE SUITE (FIRST CALCULATOR SAFE & WORKING)
     # ----------------------------------------------------
     if app_mode == "🤖 Trading Core Suite":
         head_col1, head_col2 = st.columns(2)
@@ -79,7 +79,6 @@ else:
         
         st.divider()
 
-        # Branded Live Coin Hit List Display Panel Layout
         st.markdown("### 🔥 BINANCE LIVE COIN HIT LIST (Top Gainers)")
         for item in binance_live_hit_list:
             st.markdown(f"**{item['coin']}** | <span style='color: #00E676;'>{item['gain']}</span> | *{item['status']}*", unsafe_allow_html=True)
@@ -87,7 +86,6 @@ else:
 
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CORE QUANT STRATEGY CALCULATOR MATRIX</h4>", unsafe_allow_html=True)
 
-        # LINE 1: THE UPPER 4 BOXES ROW
         uc1, uc2, uc3, uc4 = st.columns(4)
         with uc1:
             usdt_val = st.text_input("Capital (USDT)", value="30", key="f_usdt")
@@ -100,7 +98,6 @@ else:
             
         st.write("") 
 
-        # LINE 2: THE LOWER 4 BOXES ROW
         dc1, dc2, dc3, dc4 = st.columns(4)
         with dc1:
             price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
@@ -109,14 +106,12 @@ else:
         with dc3:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
-            # Automatic Profit display value matrix sync
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
             st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_final")
 
         st.write("")
         compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
 
-        # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW BOTH LINES
         st.write("") 
         launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="f_submit_btn")
 
@@ -131,7 +126,6 @@ else:
             st.session_state.owner_income += 15.0
             st.rerun()
 
-        # Summary Display Box Layer
         if st.session_state.daily_profit > 0:
             capital = float(usdt_val) if usdt_val else 30.0
             target = float(target_val) if target_val else 0.5
@@ -140,7 +134,6 @@ else:
             p_end = float(price_to) if price_to else 5000.0
             
             st.markdown("### 📊 Live Network Strategy Summary Box Matrix")
-            
             box_col1, box_col2 = st.columns(2)
             with box_col1:
                 st.info(f"💰 **Today's Daily Cycle Profit:** {round(st.session_state.daily_profit, 4)} USDT")
@@ -150,14 +143,13 @@ else:
             with box_col2:
                 daily_rate = (target / 100) * 2
                 projected_yield = capital * ((1 + daily_rate) ** days_count) if compound_active else capital + (capital * daily_rate * days_count)
-                
                 st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
                 st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
                 
                 viral_text = (
                     f"🚀 *NEXBOT AI v2.0 - TARGET POSITION HIT!* 🚀\n\n"
                     f"🔥 *Crypto Asset Node:* {coin_selected}\n"
-                    f"🎯 *Price Target Boundaries:* ${p_start} ➡️ ${p_end} (🎯 Hit Successful!)\n"
+                    f"🎯 *Price Target Boundaries:* ${p_start} ➡️ ${p_end}\n"
                     f"📈 *Today's Cycle Yield:* +{round(st.session_state.daily_profit, 4)} USDT\n"
                     f"👑 *TOTAL CUMULATIVE NETWORK PROFIT:* +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
                     f"👉 *Register via my Direct Secure Link:* https://streamlit.app"
@@ -171,14 +163,18 @@ else:
     # ----------------------------------------------------
     elif app_mode == "📜 Membership Ledger":
         st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger Terminal</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #8B949E;'>SECURE INSTITUTIONAL USER NODES ACCESS RECORD</p>", unsafe_allow_html=True)
         st.divider()
-        
-        m_col1, m_col2 = st.columns(2)
-        with m_col1:
-            st.info("👤 **User Node Account Registration Summary:**")
-            st.write("📜 **Plan Category:** 1-Year Premium Access License")
-            st.write("✅ **Network Status:** ACTIVE (Valid node integration)")
-            st.write("🔑 **Encryption Keys:** Sync verified on Binance Private Subnet")
-        with m_col2:
-            st.success("💳 **Billing Ledger Receipt Verified:**")
+        st.info("👤 **User Node Account Registration Summary:**\n\n📜 Plan Category: 1-Year Premium Access License\n✅ Status: ACTIVE\n💰 Paid Fee: 25.00 USDT")
+
+    # ----------------------------------------------------
+    # 🎛️ PAGE 3: ROYAL Q QUANT SETTINGS (THE ULTIMATE 4-COLUMN 30 EMPTY ROW MATRIX GRID)
+    # ----------------------------------------------------
+    elif app_mode == "🎛️ Royal Q Quant Settings":
+        st.markdown("<h2 style='color: #00E5FF;'>🎛️ Royal Q Advanced Quant Parameter Console</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #8B949E;'>30-LAYER MARTINGALE HIGH-FREQUENCY DCA EMPTY FORM GRID</p>", unsafe_allow_html=True)
+        st.divider()
+
+        st.markdown("<h4 style='color: #FFB300;'>📊 CUSTOM 30 OPTIONS MARGIN CALL GRID SHEET</h4>", unsafe_allow_html=True)
+        st.caption("यूज़र अपनी पसंद के अनुसार नीचे दिए गए पूरे 30 लेवेल्स के खाली डिब्बों (USDT, Target, Down, Stop-loss) को खुद मैन्युअल टाइप करके भरेगा:")
+        st.write("")
+
