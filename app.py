@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v6.0", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v6.1", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -54,7 +54,6 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
-    # ✅ ALL 3 ORIGINAL PAGES RESTORED PERFECTLY
     app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"])
     
     if app_mode == "🤖 Trading Core Suite":
@@ -70,7 +69,7 @@ else:
 
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 LINE 1: THE UPPER 4 BOXES ROW (CLEAN DIRECT STRUCTURING)
+        # 👑 LINE 1: THE UPPER 4 BOXES ROW
         uc1, uc2, uc3, uc4 = st.columns(4)
         with uc1:
             usdt_val = st.text_input("Capital (USDT)", value="30", key="f_usdt")
@@ -83,7 +82,7 @@ else:
             
         st.write("") # Micro layout spacer
 
-        # 👑 LINE 2: THE LOWER 4 BOXES ROW (4TH BOX IS THE AUTOMATIC PROFIT HIT OPTION)
+        # 👑 LINE 2: THE LOWER 4 BOXES ROW 
         dc1, dc2, dc3, dc4 = st.columns(4)
         with dc1:
             price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
@@ -93,9 +92,12 @@ else:
         with dc3:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
-            # ✅ AUTOMATIC CALCULATION TARGET PROFIT BOX PLACED EXACTLY BELOW THE UPPER 4 BOXES
-            profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
-            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed")
+            # ✅ HARD MEMORY LOCK FIX: Pulls data strictly from live active session state so it NEVER clears!
+            if st.session_state.daily_profit > 0:
+                profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT"
+            else:
+                profit_display_value = "0.0 USDT"
+            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_matrix")
 
         # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW BOTH LINES
         st.write("") 
