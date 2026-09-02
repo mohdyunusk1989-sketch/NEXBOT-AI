@@ -2,9 +2,9 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v8.5", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v8.6", page_icon="🤖", layout="wide")
 
-# Custom CSS to align labels and ensure perfect spacing
+# Custom CSS to align labels and ensure perfect dark text
 st.markdown("""
     <style>
     .block-container {
@@ -54,7 +54,7 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
-    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger"], key="main_nav_router_v85")
+    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger"], key="main_nav_router_v86")
     
     if app_mode == "🤖 Trading Core Suite":
         # Header Dynamic Ribbon
@@ -67,7 +67,7 @@ else:
         
         st.divider()
 
-        # ✅ THE 4 CORE CONTROL INPUTS AT THE TOP (AS REQUESTED BY YUNUS BHAI)
+        # ✅ THE 4 CORE CONTROL INPUTS AT THE TOP (PERFECT INLINE DESIGN)
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>🎛️ CORE STRATEGY PARAMETERS (FULL USER CONTROL)</h4>", unsafe_allow_html=True)
         
         uc1, uc2, uc3, uc4 = st.columns(4)
@@ -78,7 +78,7 @@ else:
         with uc3:
             down_val = st.text_input("3. Down Drop % Trigger", value="1.1", key="f_down")
         with uc4:
-            # ✅ STOP LOSS IS COMPLETELY OPTIONAL: Can run with or without checking the box
+            # Optional Stop Loss Choice
             stop_loss_active = st.checkbox("4. Enable Intelligent Stop-Loss", value=False, key="f_sl_check")
             if stop_loss_active:
                 sl_percentage = st.text_input("Stop-Loss Percentage (%)", value="5.0", key="f_sl_val")
@@ -98,7 +98,7 @@ else:
             st.session_state.owner_income += 15.0
             st.rerun()
 
-        # Dynamic Grid Processing
+        # Dynamic Grid Processing View - Uses Native Clean Markdown instead of raw HTML strings!
         if st.session_state.daily_profit > 0:
             capital = float(usdt_val) if usdt_val else 30.0
             target = float(target_val) if target_val else 0.5
@@ -107,38 +107,23 @@ else:
             st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CORE NETWORK SUITE VERIFIED: STRATEGY ENGINE LAUNCHED SUCCESSFULLY! 🎉</div>", unsafe_allow_html=True)
             st.write("")
 
-            # 👑 THE UNBELIEVABLE 30 AUTOMATED OPTIONS GRIDS (AS DRAWN ON PAPER BY YUNUS BHAI)
+            # 👑 THE UNBELIEVABLE 30 AUTOMATED OPTIONS GRIDS SHOWING NATIVE NATION-WIDE
             st.markdown("### 📊 30-Layer Martingale Margin Call Settings Matrix")
             st.caption("When the market drops based on Option 3 (Down Drop %), the system automatically triggers the next layered options buying algorithm below:")
+            st.write("")
 
-            # Rendering the exact 30 options list row loop
-            table_html = """
-            <table style='width:100%; border:1px solid #444; border-collapse:collapse; text-align:center;'>
-                <tr style='background-color:#2D1A38; color:#00E5FF; font-weight:bold;'>
-                    <th style='padding:10px; border:1px solid #444;'>🛠️ Active Options Grid</th>
-                    <th style='padding:10px; border:1px solid #444;'>📉 Accumulation Trigger Drop</th>
-                    <th style='padding:10px; border:1px solid #444;'>💰 Automatic Buying Allocation</th>
-                    <th style='padding:10px; border:1px solid #444;'>🤖 Blockchain Execution Style</th>
-                </tr>
-            """
-            
+            # Beautiful Native Clean Matrix Output
             for option_num in range(1, 31):
-                # Simulated incremental Martingale multipliers for mathematical authority look
                 drop_trigger_calc = round(down_drop * option_num, 2)
                 multiplier = 1 if option_num <= 4 else 2 if option_num <= 10 else 4
                 buying_amount_calc = round(capital * multiplier, 2)
                 
-                table_html += f"""
-                <tr style='color:white;'>
-                    <td style='padding:8px; border:1px solid #444; font-weight:bold; color:#FFB300;'>Option Layer {option_num}</td>
-                    <td style='padding:8px; border:1px solid #444; color:#FF1744;'>-{drop_trigger_calc}% Market Drop</td>
-                    <td style='padding:8px; border:1px solid #444; color:#00E676;'>{buying_amount_calc} USDT (Auto-Buy)</td>
-                    <td style='padding:8px; border:1px solid #444;'>{"Automatic Scalping 📈" if option_num == 1 else "Smart DCA Re-buy ⚡" if option_num == 2 else "Quantum Liquidity Hedging 🚀"}</td>
-                </tr>
-                """
+                # Pro-trading text string format
+                execution_label = "Automatic Scalping 📈" if option_num == 1 else "Smart DCA Re-buy ⚡" if option_num == 2 else "Quantum Liquidity Hedging 🚀"
                 
-            table_html += "</table>"
-            st.markdown(table_html, unsafe_allow_html=True)
+                # Multi-metric display panel
+                st.write(f"🔹 **Option Layer {option_num}:** {drop_trigger_calc}% Market Drop ➡️ **Auto-Buy Allocation:** {buying_amount_calc} USDT | *Execution:* {execution_label}")
+
             st.divider()
 
             # Viral Marketing Blast Template Link Engine
