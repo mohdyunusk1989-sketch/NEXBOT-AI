@@ -2,10 +2,27 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v7.1", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v7.2", page_icon="🤖", layout="wide")
 
-# Custom CSS to center labels and ensure perfect spacing
-st.markdown("<style>.block-container {padding-top: 1.5rem !important; padding-bottom: 1.5rem !important;} .stTextInput input, .stSelectbox div {text-align: center !important; font-weight: bold !important;}</style>", unsafe_allow_html=True)
+# Custom CSS to center labels and ensure perfect dark text for disabled input labels
+st.markdown("""
+    <style>
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+    .stTextInput input, .stSelectbox div {
+        text-align: center !important;
+        font-weight: bold !important;
+    }
+    /* Force the disabled label text to match normal labels perfectly */
+    div[data-testid="stWidgetLabel"] p {
+        font-size: 1rem !important;
+        color: inherit !important;
+        font-weight: normal !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # Cryptocurrencies list
 binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT"]
@@ -79,8 +96,9 @@ else:
             compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
+            # ✅ LABELS ALIGNED FIXED: Value displays perfectly in full sync without shrinking the text label
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
-            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_final")
+            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_label")
 
         # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW BOTH LINES
         st.write("") 
@@ -95,7 +113,6 @@ else:
             st.session_state.total_profit += st.session_state.daily_profit
             st.session_state.fuel_wallet -= (st.session_state.daily_profit * 0.05)
             st.session_state.owner_income += 15.0
-            st.grid_profit_grid_output_fixed_final = f"{round(st.session_state.daily_profit, 4)} USDT"
             st.rerun()
 
         # Summary Display Box Layer
@@ -159,4 +176,3 @@ else:
         
         st.markdown("### 📊 Martingale Margin Call Settings Matrix (Pre-Configured Options)")
         st.warning("🤖 System execution logic is processing under Quantum Dual-Wallet Liquidity Node Framework.")
-        st.code("1st Call: 1.1% Drop | Multiplier Buy Ratio: 1x First Buy\n2nd Call: 1.5% Drop | Multiplier Buy Ratio: 2x First Buy\n3rd Call: 2.0% Drop | Multiplier Buy Ratio: 4x First Buy\n4th Call: 2.5% Drop | Multiplier Buy Ratio: 8x First Buy\n5th to 10th Call: Dynamic Layer Optimization Matrix Activated")
