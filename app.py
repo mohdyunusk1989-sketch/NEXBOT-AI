@@ -52,7 +52,6 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
-    # ✅ ALL 3 ORIGINAL PAGES RESTORED PERFECTLY
     app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"])
     
     if app_mode == "🤖 Trading Core Suite":
@@ -91,7 +90,6 @@ else:
         with dc3:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
-            # ✅ RE-POSITIONED: Profit (USDT) box is now perfectly on the 2nd line, forming a balanced grid!
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
             st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_final")
 
@@ -104,7 +102,6 @@ else:
         if launch_action:
             val_capital = float(usdt_val) if usdt_val else 30.0
             val_target = float(target_val) if target_val else 0.5
-            
             st.session_state.daily_profit = val_capital * (val_target / 100)
             st.session_state.total_profit += st.session_state.daily_profit
             st.session_state.fuel_wallet -= (st.session_state.daily_profit * 0.05)
@@ -151,10 +148,10 @@ else:
                 whatsapp_url = f"https://whatsapp.com{encoded_text}"
                 st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
 
-    # ✅ 2ND PAGE REPAIRED: Full Premium Membership Data Activated
+    # 📜 MEMBERSHIP LEDGER PAGE
     elif app_mode == "📜 Membership Ledger":
         st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger Terminal</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #8B949E;'>SECURE INSTIUTIONAL USER NODES ACCESS RECORD</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #8B949E;'>SECURE INSTITUTIONAL USER NODES ACCESS RECORD</p>", unsafe_allow_html=True)
         st.divider()
         
         m_col1, m_col2 = st.columns(2)
@@ -169,7 +166,7 @@ else:
             st.write("🗓️ **Activation Date:** September 02, 2026")
             st.write("🛡️ **Enforced Security Node:** Private Firewall Safe")
 
-    # ✅ 3RD PAGE REPAIRED: Full Martingale Advanced Grid Parameters Matrix Table Activated
+    # ⚙️ ADVANCED PARAMETERS PAGE 
     elif app_mode == "⚙️ Advanced Parameters":
         st.markdown("<h2 style='color: #00E5FF;'>⚙️ Advanced Quantitative Strategy Parameters</h2>", unsafe_allow_html=True)
         st.markdown("<p style='color: #8B949E;'>ROYAL Q AUTOMATED HIGH-FREQUENCY DCA GRIDS</p>", unsafe_allow_html=True)
@@ -178,5 +175,10 @@ else:
         st.markdown("### 📊 Martingale Margin Call Settings Matrix (Pre-Configured Options)")
         st.warning("🤖 System execution logic is processing under Quantum Dual-Wallet Liquidity Node Framework.")
         
-        # Displaying an absolute professional trading matrix table to amaze the users
+        # Displaying professional trading matrix table safely packed
         st.markdown("""
+
+| Margin Call Level | Market Drop % Trigger | Multiplier Buy Ratio | Current Execution Target Style |
+| :--- | :--- | :--- | :--- |
+| **1st Call** | 1.1% Drop | 1x First Buy | Automatic Scalping 📈 |
+| **2nd Call** | 1.5% Drop | 2x First Buy | Smart Accumulation ⚡ |
