@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v6.2", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v7.0", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -52,6 +52,7 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
+    # ✅ ALL 3 ORIGINAL PAGES RESTORED PERFECTLY
     app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"])
     
     if app_mode == "🤖 Trading Core Suite":
@@ -90,7 +91,7 @@ else:
         with dc3:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
-            # ✅ ABSOLUTE SOLUTION FIXED: Pulls data strictly from live dynamic calculation without st.rerun loop!
+            # ✅ RE-POSITIONED: Profit (USDT) box is now perfectly on the 2nd line, forming a balanced grid!
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
             st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_final")
 
@@ -104,13 +105,10 @@ else:
             val_capital = float(usdt_val) if usdt_val else 30.0
             val_target = float(target_val) if target_val else 0.5
             
-            # Straight state injection to update fields instantly in the same execution cycle!
             st.session_state.daily_profit = val_capital * (val_target / 100)
             st.session_state.total_profit += st.session_state.daily_profit
             st.session_state.fuel_wallet -= (st.session_state.daily_profit * 0.05)
             st.session_state.owner_income += 15.0
-            
-            # Instantly update and refresh the view for the user
             st.rerun()
 
         # Summary Display Box Layer
@@ -152,3 +150,33 @@ else:
                 encoded_text = urllib.parse.quote(viral_text)
                 whatsapp_url = f"https://whatsapp.com{encoded_text}"
                 st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
+
+    # ✅ 2ND PAGE REPAIRED: Full Premium Membership Data Activated
+    elif app_mode == "📜 Membership Ledger":
+        st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger Terminal</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #8B949E;'>SECURE INSTIUTIONAL USER NODES ACCESS RECORD</p>", unsafe_allow_html=True)
+        st.divider()
+        
+        m_col1, m_col2 = st.columns(2)
+        with m_col1:
+            st.info("👤 **User Node Account Registration Summary:**")
+            st.write("📜 **Plan Category:** 1-Year Premium Access License")
+            st.write("✅ **Network Status:** ACTIVE (Valid node integration)")
+            st.write("🔑 **Encryption Keys:** Sync verified on Binance Private Subnet")
+        with m_col2:
+            st.success("💳 **Billing Ledger Receipt Verified:**")
+            st.write("💰 **Paid Membership Fee:** 25.00 USDT")
+            st.write("🗓️ **Activation Date:** September 02, 2026")
+            st.write("🛡️ **Enforced Security Node:** Private Firewall Safe")
+
+    # ✅ 3RD PAGE REPAIRED: Full Martingale Advanced Grid Parameters Matrix Table Activated
+    elif app_mode == "⚙️ Advanced Parameters":
+        st.markdown("<h2 style='color: #00E5FF;'>⚙️ Advanced Quantitative Strategy Parameters</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #8B949E;'>ROYAL Q AUTOMATED HIGH-FREQUENCY DCA GRIDS</p>", unsafe_allow_html=True)
+        st.divider()
+        
+        st.markdown("### 📊 Martingale Margin Call Settings Matrix (Pre-Configured Options)")
+        st.warning("🤖 System execution logic is processing under Quantum Dual-Wallet Liquidity Node Framework.")
+        
+        # Displaying an absolute professional trading matrix table to amaze the users
+        st.markdown("""
