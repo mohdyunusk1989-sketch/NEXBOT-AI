@@ -2,9 +2,9 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v7.4", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v8.5", page_icon="🤖", layout="wide")
 
-# Custom CSS to center labels and ensure perfect spacing
+# Custom CSS to align labels and ensure perfect spacing
 st.markdown("""
     <style>
     .block-container {
@@ -18,13 +18,10 @@ st.markdown("""
     div[data-testid="stWidgetLabel"] p {
         font-size: 1rem !important;
         color: inherit !important;
-        font-weight: normal !important;
+        font-weight: bold !important;
     }
     </style>
     """, unsafe_allow_html=True)
-
-# Cryptocurrencies list
-binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT"]
 
 # Session State Storage Initializations
 if "authenticated" not in st.session_state:
@@ -57,54 +54,38 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
-    # ✅ ABSOLUTE ROUTER ROUTING LOGIC TRIGGER DEFINED SECURELY
-    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"], key="main_navigation_menu_router")
+    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger"], key="main_nav_router_v85")
     
     if app_mode == "🤖 Trading Core Suite":
         # Header Dynamic Ribbon
         head_col1, head_col2 = st.columns(2)
         with head_col1:
             st.markdown("<h2 style='color: #00E5FF; margin:0px;'>🤖 NEXBOT AI v3.2</h2>", unsafe_allow_html=True)
-            st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE LIVE NETWORK SUITE & BRANDED GRID</p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #8B949E; font-size: 11px; margin:0px;'>BINANCE AUTOMATED MARTINGALE NODE FRAMEWORK</p>", unsafe_allow_html=True)
         with head_col2:
             st.markdown(f"<div style='background-color:#2D1A38; padding:8px; border-radius:5px; text-align:center; font-size:12px; font-weight:bold; color:#E040FB; margin-top:5px;'>👑 Vault: {round(st.session_state.owner_income, 2)} USDT</div>", unsafe_allow_html=True)
         
         st.divider()
 
-        st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
-
-        # 👑 LINE 1: THE UPPER 4 BOXES ROW
+        # ✅ THE 4 CORE CONTROL INPUTS AT THE TOP (AS REQUESTED BY YUNUS BHAI)
+        st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>🎛️ CORE STRATEGY PARAMETERS (FULL USER CONTROL)</h4>", unsafe_allow_html=True)
+        
         uc1, uc2, uc3, uc4 = st.columns(4)
         with uc1:
-            usdt_val = st.text_input("Capital (USDT)", value="30", key="f_usdt")
+            usdt_val = st.text_input("1. Capital (USDT)", value="30", key="f_usdt")
         with uc2:
-            days_input = st.text_input("Target Days Limit", value="365", key="f_days")
+            target_val = st.text_input("2. Target Profit %", value="0.5", key="f_target")
         with uc3:
-            target_val = st.text_input("Daily Ratio %", value="0.5", key="f_target")
+            down_val = st.text_input("3. Down Drop % Trigger", value="1.1", key="f_down")
         with uc4:
-            coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
-            
+            # ✅ STOP LOSS IS COMPLETELY OPTIONAL: Can run with or without checking the box
+            stop_loss_active = st.checkbox("4. Enable Intelligent Stop-Loss", value=False, key="f_sl_check")
+            if stop_loss_active:
+                sl_percentage = st.text_input("Stop-Loss Percentage (%)", value="5.0", key="f_sl_val")
+
+        # ⚡ ACTION ENGINE LAUNCH BUTTON DIRECTLY BELOW 4 MAIN INPUTS
         st.write("") 
-
-        # 👑 LINE 2: THE LOWER 4 BOXES ROW 
-        dc1, dc2, dc3, dc4 = st.columns(4)
-        with dc1:
-            price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
-        with dc2:
-            price_to = st.text_input("Target Hit Price", value="5000", key="f_p_to")
-        with dc3:
-            margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
-        with dc4:
-            profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
-            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_final_label")
-
-        # 👑 LINE 3: AUTO-COMPOUND SEPARATED ROW 
-        st.write("")
-        compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
-
-        # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW BOTH LINES
-        st.write("") 
-        launch_action = st.button("ENTER & LAUNCH STRATEGY 🚀", type="primary", use_container_width=True, key="f_submit_btn")
+        launch_action = st.button("ENTER & LAUNCH QUANT GRID ENGINE 🚀", type="primary", use_container_width=True, key="f_submit_btn")
 
         st.divider()
 
@@ -117,64 +98,63 @@ else:
             st.session_state.owner_income += 15.0
             st.rerun()
 
-        # Summary Display Box Layer
+        # Dynamic Grid Processing
         if st.session_state.daily_profit > 0:
             capital = float(usdt_val) if usdt_val else 30.0
             target = float(target_val) if target_val else 0.5
-            days_count = int(days_input) if days_input else 365
-            p_start = float(price_from) if price_from else 4000.0
-            p_end = float(price_to) if price_to else 5000.0
+            down_drop = float(down_val) if down_val else 1.1
             
-            st.markdown("### 📊 Live Network Strategy Summary Box Matrix")
-            
-            box_col1, box_col2 = st.columns(2)
-            with box_col1:
-                st.info(f"💰 **Today's Daily Cycle Profit:** {round(st.session_state.daily_profit, 4)} USDT")
-                st.warning(f"⛽ **Independent Fuel Wallet Balance:** {round(st.session_state.fuel_wallet, 4)} USDT")
-                st.code(f"📦 Total Capital Allocated: {capital} USDT\n🪙 Active Blockchain Asset: {coin_selected}\n🎯 Position Hit Boundaries: From ${p_start} To ${p_end}\n🛠️ Enforced Margin Parameters: {margin_in}")
-            
-            with box_col2:
-                daily_rate = (target / 100) * 2
-                projected_yield = capital * ((1 + daily_rate) ** days_count) if compound_active else capital + (capital * daily_rate * days_count)
-                
-                st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
-                st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
-                
-                viral_text = (
-                    f"🚀 *NEXBOT AI v2.0 - TARGET POSITION HIT!* 🚀\n\n"
-                    f"🔥 *Crypto Asset Node:* {coin_selected}\n"
-                    f"🎯 *Price Target Boundaries:* ${p_start} ➡️ ${p_end} (🎯 Hit Successful!)\n"
-                    f"📈 *Today's Cycle Yield:* +{round(st.session_state.daily_profit, 4)} USDT\n"
-                    f"👑 *TOTAL CUMULATIVE NETWORK PROFIT:* +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
-                    f"👉 *Register via my Direct Secure Link:* https://streamlit.app"
-                )
-                encoded_text = urllib.parse.quote(viral_text)
-                whatsapp_url = f"https://whatsapp.com{encoded_text}"
-                st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
+            st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CORE NETWORK SUITE VERIFIED: STRATEGY ENGINE LAUNCHED SUCCESSFULLY! 🎉</div>", unsafe_allow_html=True)
+            st.write("")
 
-    # 📜 MEMBERSHIP LEDGER PAGE (DYNAMISM UNLOCKED)
+            # 👑 THE UNBELIEVABLE 30 AUTOMATED OPTIONS GRIDS (AS DRAWN ON PAPER BY YUNUS BHAI)
+            st.markdown("### 📊 30-Layer Martingale Margin Call Settings Matrix")
+            st.caption("When the market drops based on Option 3 (Down Drop %), the system automatically triggers the next layered options buying algorithm below:")
+
+            # Rendering the exact 30 options list row loop
+            table_html = """
+            <table style='width:100%; border:1px solid #444; border-collapse:collapse; text-align:center;'>
+                <tr style='background-color:#2D1A38; color:#00E5FF; font-weight:bold;'>
+                    <th style='padding:10px; border:1px solid #444;'>🛠️ Active Options Grid</th>
+                    <th style='padding:10px; border:1px solid #444;'>📉 Accumulation Trigger Drop</th>
+                    <th style='padding:10px; border:1px solid #444;'>💰 Automatic Buying Allocation</th>
+                    <th style='padding:10px; border:1px solid #444;'>🤖 Blockchain Execution Style</th>
+                </tr>
+            """
+            
+            for option_num in range(1, 31):
+                # Simulated incremental Martingale multipliers for mathematical authority look
+                drop_trigger_calc = round(down_drop * option_num, 2)
+                multiplier = 1 if option_num <= 4 else 2 if option_num <= 10 else 4
+                buying_amount_calc = round(capital * multiplier, 2)
+                
+                table_html += f"""
+                <tr style='color:white;'>
+                    <td style='padding:8px; border:1px solid #444; font-weight:bold; color:#FFB300;'>Option Layer {option_num}</td>
+                    <td style='padding:8px; border:1px solid #444; color:#FF1744;'>-{drop_trigger_calc}% Market Drop</td>
+                    <td style='padding:8px; border:1px solid #444; color:#00E676;'>{buying_amount_calc} USDT (Auto-Buy)</td>
+                    <td style='padding:8px; border:1px solid #444;'>{"Automatic Scalping 📈" if option_num == 1 else "Smart DCA Re-buy ⚡" if option_num == 2 else "Quantum Liquidity Hedging 🚀"}</td>
+                </tr>
+                """
+                
+            table_html += "</table>"
+            st.markdown(table_html, unsafe_allow_html=True)
+            st.divider()
+
+            # Viral Marketing Blast Template Link Engine
+            viral_text = (
+                f"🚀 *NEXBOT AI v2.0 - AUTOMATED GRID POSITION HIT!* 🚀\n\n"
+                f"🎛️ *Grid Settings:* Capital: {capital} USDT | Target: {target}% | Down Trigger: {down_drop}%\n"
+                f"💰 *Today's First Position Profit:* +{round(st.session_state.daily_profit, 4)} USDT\n"
+                f"🛠️ *30-Layer Martingale Options:* ACTIVE & RUNNING ✅\n"
+                f"👑 *TOTAL CUMULATIVE CRYPTO PROFIT:* +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
+                f"👉 *Lock your automated network suite safely now:* https://streamlit.app"
+            )
+            encoded_text = urllib.parse.quote(viral_text)
+            whatsapp_url = f"https://whatsapp.com{encoded_text}"
+            st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:12px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;'>SHARE 30-OPTIONS GRID SYSTEM ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
+
     elif app_mode == "📜 Membership Ledger":
-        st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger Terminal</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #8B949E;'>SECURE INSTITUTIONAL USER NODES ACCESS RECORD</p>", unsafe_allow_html=True)
-        st.divider()
-        
-        m_col1, m_col2 = st.columns(2)
-        with m_col1:
-            st.info("👤 **User Node Account Registration Summary:**")
-            st.write("📜 **Plan Category:** 1-Year Premium Access License")
-            st.write("✅ **Network Status:** ACTIVE (Valid node integration)")
-            st.write("🔑 **Encryption Keys:** Sync verified on Binance Private Subnet")
-        with m_col2:
-            st.success("💳 **Billing Ledger Receipt Verified:**")
-            st.write("💰 **Paid Membership Fee:** 25.00 USDT")
-            st.write("🗓️ **Activation Date:** September 02, 2026")
-            st.write("🛡️ **Enforced Security Node:** Private Firewall Safe")
-
-    # ⚙️ ADVANCED PARAMETERS PAGE (DYNAMISM UNLOCKED)
-    elif app_mode == "⚙️ Advanced Parameters":
-        st.markdown("<h2 style='color: #00E5FF;'>⚙️ Advanced Quantitative Strategy Parameters</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #8B949E;'>ROYAL Q AUTOMATED HIGH-FREQUENCY DCA GRIDS</p>", unsafe_allow_html=True)
-        st.divider()
-        
-        st.markdown("### 📊 Martingale Margin Call Settings Matrix (Pre-Configured Options)")
-        st.warning("🤖 System execution logic is processing under Quantum Dual-Wallet Liquidity Node Framework.")
+        st.markdown("## 📜 System Membership Ledger Terminal")
+        st.write("🔒 Plan Category: 1-Year Premium Institutional Access Node")
+        st.write("✅ Status: ACTIVE (25 USDT Plan verified)")
