@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v7.3", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v7.4", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -15,7 +15,6 @@ st.markdown("""
         text-align: center !important;
         font-weight: bold !important;
     }
-    /* Force the disabled label text to match normal labels perfectly */
     div[data-testid="stWidgetLabel"] p {
         font-size: 1rem !important;
         color: inherit !important;
@@ -58,7 +57,8 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
-    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"])
+    # ✅ ABSOLUTE ROUTER ROUTING LOGIC TRIGGER DEFINED SECURELY
+    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"], key="main_navigation_menu_router")
     
     if app_mode == "🤖 Trading Core Suite":
         # Header Dynamic Ribbon
@@ -84,23 +84,21 @@ else:
         with uc4:
             coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
             
-        st.write("") # Micro layout spacer
+        st.write("") 
 
-        # 👑 LINE 2: THE LOWER 4 BOXES ROW (EXPANDED TO 4 SEPARATE COLUMNS TO PREVENT VERTICAL STACKING)
+        # 👑 LINE 2: THE LOWER 4 BOXES ROW 
         dc1, dc2, dc3, dc4 = st.columns(4)
         with dc1:
             price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
         with dc2:
             price_to = st.text_input("Target Hit Price", value="5000", key="f_p_to")
         with dc3:
-            # ✅ RESOLVED: Margin Call Limit now sits completely alone in its own neat clean single slot!
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
-            # ✅ RESOLVED: Profit Hit Box labels and inputs will remain 100% horizontal and perfectly straight
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
             st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_final_label")
 
-        # 👑 LINE 3: AUTO-COMPOUND SEPARATED ROW (KEEPS THE GRID ULTRA CLEAN AND FLAT)
+        # 👑 LINE 3: AUTO-COMPOUND SEPARATED ROW 
         st.write("")
         compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
 
@@ -154,7 +152,7 @@ else:
                 whatsapp_url = f"https://whatsapp.com{encoded_text}"
                 st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
 
-    # 📜 MEMBERSHIP LEDGER PAGE
+    # 📜 MEMBERSHIP LEDGER PAGE (DYNAMISM UNLOCKED)
     elif app_mode == "📜 Membership Ledger":
         st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger Terminal</h2>", unsafe_allow_html=True)
         st.markdown("<p style='color: #8B949E;'>SECURE INSTITUTIONAL USER NODES ACCESS RECORD</p>", unsafe_allow_html=True)
@@ -172,10 +170,11 @@ else:
             st.write("🗓️ **Activation Date:** September 02, 2026")
             st.write("🛡️ **Enforced Security Node:** Private Firewall Safe")
 
-    # ⚙️ ADVANCED PARAMETERS PAGE
+    # ⚙️ ADVANCED PARAMETERS PAGE (DYNAMISM UNLOCKED)
     elif app_mode == "⚙️ Advanced Parameters":
         st.markdown("<h2 style='color: #00E5FF;'>⚙️ Advanced Quantitative Strategy Parameters</h2>", unsafe_allow_html=True)
         st.markdown("<p style='color: #8B949E;'>ROYAL Q AUTOMATED HIGH-FREQUENCY DCA GRIDS</p>", unsafe_allow_html=True)
         st.divider()
         
         st.markdown("### 📊 Martingale Margin Call Settings Matrix (Pre-Configured Options)")
+        st.warning("🤖 System execution logic is processing under Quantum Dual-Wallet Liquidity Node Framework.")
