@@ -2,9 +2,9 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v7.2", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v7.3", page_icon="🤖", layout="wide")
 
-# Custom CSS to center labels and ensure perfect dark text for disabled input labels
+# Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
     <style>
     .block-container {
@@ -86,19 +86,23 @@ else:
             
         st.write("") # Micro layout spacer
 
-        # 👑 LINE 2: THE LOWER 4 BOXES ROW 
+        # 👑 LINE 2: THE LOWER 4 BOXES ROW (EXPANDED TO 4 SEPARATE COLUMNS TO PREVENT VERTICAL STACKING)
         dc1, dc2, dc3, dc4 = st.columns(4)
         with dc1:
             price_from = st.text_input("Current Entry Price", value="4000", key="f_p_from")
         with dc2:
             price_to = st.text_input("Target Hit Price", value="5000", key="f_p_to")
         with dc3:
-            compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
+            # ✅ RESOLVED: Margin Call Limit now sits completely alone in its own neat clean single slot!
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
         with dc4:
-            # ✅ LABELS ALIGNED FIXED: Value displays perfectly in full sync without shrinking the text label
+            # ✅ RESOLVED: Profit Hit Box labels and inputs will remain 100% horizontal and perfectly straight
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.daily_profit > 0 else "0.0 USDT"
-            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_label")
+            st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output_fixed_final_label")
+
+        # 👑 LINE 3: AUTO-COMPOUND SEPARATED ROW (KEEPS THE GRID ULTRA CLEAN AND FLAT)
+        st.write("")
+        compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
 
         # ⚡ ACTION ENGINE BUTTON DIRECTLY BELOW BOTH LINES
         st.write("") 
@@ -175,4 +179,3 @@ else:
         st.divider()
         
         st.markdown("### 📊 Martingale Margin Call Settings Matrix (Pre-Configured Options)")
-        st.warning("🤖 System execution logic is processing under Quantum Dual-Wallet Liquidity Node Framework.")
