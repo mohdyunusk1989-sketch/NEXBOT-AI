@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v5.7", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v5.8", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -51,10 +51,10 @@ if not st.session_state.authenticated:
         else:
             st.error("❌ INVALID UN-ENFORCED ACCESS PIN! ACCESS STRICTLY DENIED!")
 
-# --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD (ROYAL Q STYLE COMPLETE) ---
+# --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### 🧭 NexBot Control Menu")
-    # ✅ ALL 3 ORIGINAL PAGES RESTORED PERFECTLY INSIDE NAVIGATION
+    # ✅ ALL 3 ORIGINAL PAGES RESTORED PERFECTLY
     app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "⚙️ Advanced Parameters"])
     
     if app_mode == "🤖 Trading Core Suite":
@@ -70,30 +70,30 @@ else:
 
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CUSTOM STRATEGY CALCULATE MATRIX</h4>", unsafe_allow_html=True)
 
-        # 👑 LINE 1: THE UPPER 4 BOXES ROW
+        # 👑 FIXED LAYOUT: 4 Upper Boxes Row (Correct Index Placement)
         up_cols = st.columns(4)
-        with up_cols:
+        with up_cols[0]:
             usdt_val = st.text_input("Capital (USDT)", value="10", key="f_usdt")
-        with up_cols:
+        with up_cols[1]:
             days_input = st.text_input("Target Days Limit", value="365", key="f_days")
-        with up_cols:
+        with up_cols[2]:
             target_val = st.text_input("Daily Ratio %", value="0.5", key="f_target")
-        with up_cols:
+        with up_cols[3]:
             coin_selected = st.selectbox("Crypto Token", options=binance_all_coins, index=0, key="f_coin")
             
         st.write("") # Micro layout spacer
 
-        # 👑 LINE 2: THE LOWER 4 BOXES ROW (4TH BOX IS THE AUTOMATIC PROFIT HIT OPTION)
+        # 👑 FIXED LAYOUT: 4 Lower Boxes Row (4th box is Target Profit Hit Box)
         down_cols = st.columns(4)
-        with down_cols:
+        with down_cols[0]:
             price_from = st.text_input("Current Entry Price", value="3000", key="f_p_from")
-        with down_cols:
+        with down_cols[1]:
             price_to = st.text_input("Target Hit Price", value="3500", key="f_p_to")
             compound_active = st.checkbox("Auto-Compound Growth Strategy", value=True, key="f_comp")
-        with down_cols:
+        with down_cols[2]:
             margin_in = st.selectbox("Margin Call Limit", options=[f"Calls: {i}" for i in range(1, 11)], index=6, key="f_margin")
-        with down_cols:
-            # ✅ ABSOLUTE FIX: Target Profit Hit Box displays calculation value automatically on enter click!
+        with down_cols[3]:
+            # ✅ AUTOMATIC CALCULATION TARGET PROFIT BOX PLACED EXACTLY BELOW THE UPPER 4 BOXES
             profit_display_value = f"{round(st.session_state.daily_profit, 4)} USDT" if st.session_state.show_success else "0.0 USDT"
             st.text_input("Target Profit Hit (USDT)", value=profit_display_value, disabled=True, key="f_profit_grid_output")
 
@@ -114,7 +114,7 @@ else:
             st.session_state.show_success = True
             st.rerun()
 
-        # Summary Display Box Layer and WhatsApp configuration
+        # Summary Display Box Layer
         if st.session_state.show_success:
             capital = float(usdt_val) if usdt_val else 10.0
             target = float(target_val) if target_val else 0.5
@@ -142,7 +142,6 @@ else:
                 st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
                 st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
                 
-                # WhatsApp Text blast with massive Cumulative profit display logic
                 viral_text = (
                     f"🚀 *NEXBOT AI v2.0 - TARGET POSITION HIT!* 🚀\n\n"
                     f"🔥 *Crypto Asset Node:* {coin_selected}\n"
