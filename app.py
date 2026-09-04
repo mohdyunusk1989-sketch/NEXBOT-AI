@@ -2,7 +2,7 @@ import streamlit as st
 import urllib.parse
 
 # Premium UI Wide layout configuration
-st.set_page_config(page_title="NexBot AI - Institutional Elite v9.6", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NexBot AI - Institutional Elite v9.7", page_icon="🤖", layout="wide")
 
 # Custom CSS to center labels and ensure perfect spacing
 st.markdown("""
@@ -63,8 +63,7 @@ if not st.session_state.authenticated:
 # --- 🤖 MAIN OPERATIONAL TRADING DASHBOARD ---
 else:
     st.sidebar.markdown("### Compass NexBot Control Menu")
-    # ✅ RENAMED & UPDATED ARCHITECTURE AS REQUESTED
-    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "🎛️ Royal Q Quant Settings"], key="master_router_final_v96")
+    app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "🎛️ Royal Q Quant Settings"], key="master_router_final_v97")
     
     # ----------------------------------------------------
     # 👑 PAGE 1: TRADING CORE SUITE (FIRST CALCULATOR SAFE & WORKING)
@@ -167,7 +166,7 @@ else:
         st.info("👤 **User Node Account Registration Summary:**\n\n📜 Plan Category: 1-Year Premium Access License\n✅ Status: ACTIVE\n💰 Paid Fee: 25.00 USDT")
 
     # ----------------------------------------------------
-    # 🎛️ PAGE 3: ROYAL Q QUANT SETTINGS (THE ULTIMATE 4-COLUMN 30 EMPTY ROW MATRIX GRID)
+    # 🎛️ PAGE 3: ROYAL Q QUANT SETTINGS (THE ULTIMATE 4-COLUMN INLINE CLEAN ENGINE)
     # ----------------------------------------------------
     elif app_mode == "🎛️ Royal Q Quant Settings":
         st.markdown("<h2 style='color: #00E5FF;'>🎛️ Royal Q Advanced Quant Parameter Console</h2>", unsafe_allow_html=True)
@@ -178,3 +177,4 @@ else:
         st.caption("यूज़र अपनी पसंद के अनुसार नीचे दिए गए पूरे 30 लेवेल्स के खाली डिब्बों (USDT, Target, Down, Stop-loss) को खुद मैन्युअल टाइप करके भरेगा:")
         st.write("")
 
+        # ✅ PERFECT FIXED CLEAN INLINE RENDERING FOR ALL 30 OPTIONS LAYER BY LAYER
