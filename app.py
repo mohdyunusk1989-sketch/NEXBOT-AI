@@ -66,7 +66,7 @@ else:
     app_mode = st.sidebar.selectbox("Navigation Menu", ["🤖 Trading Core Suite", "📜 Membership Ledger", "🎛️ Royal Q Quant Settings"], key="master_router_final_v97")
     
     # ----------------------------------------------------
-    # 👑 PAGE 1: TRADING CORE SUITE (FIRST CALCULATOR SAFE & WORKING)
+    # 👑 PAGE 1: TRADING CORE SUITE
     # ----------------------------------------------------
     if app_mode == "🤖 Trading Core Suite":
         head_col1, head_col2 = st.columns(2)
@@ -80,7 +80,7 @@ else:
 
         st.markdown("### 🔥 BINANCE LIVE COIN HIT LIST (Top Gainers)")
         for item in binance_live_hit_list:
-            st.markdown(f"**{item['coin']}** | <span style='color: #00E676;'>{item['gain']}</span> | *{item['status']}*", unsafe_allow_html=True)
+            st.markdown(f"*{item['coin']}* | <span style='color: #00E676;'>{item['gain']}</span> | {item['status']}", unsafe_allow_html=True)
         st.divider()
 
         st.markdown("<h4 style='color: #FFB300; margin-bottom: 15px;'>📊 CORE QUANT STRATEGY CALCULATOR MATRIX</h4>", unsafe_allow_html=True)
@@ -129,52 +129,4 @@ else:
             capital = float(usdt_val) if usdt_val else 30.0
             target = float(target_val) if target_val else 0.5
             days_count = int(days_input) if days_input else 365
-            p_start = float(price_from) if price_from else 4000.0
-            p_end = float(price_to) if price_to else 5000.0
-            
-            st.markdown("### 📊 Live Network Strategy Summary Box Matrix")
-            box_col1, box_col2 = st.columns(2)
-            with box_col1:
-                st.info(f"💰 **Today's Daily Cycle Profit:** {round(st.session_state.daily_profit, 4)} USDT")
-                st.warning(f"⛽ **Independent Fuel Wallet Balance:** {round(st.session_state.fuel_wallet, 4)} USDT")
-                st.code(f"📦 Total Capital Allocated: {capital} USDT\n🪙 Active Blockchain Asset: {coin_selected}\n🎯 Position Hit Boundaries: From ${p_start} To ${p_end}\n🛠️ Enforced Margin Parameters: {margin_in}")
-            
-            with box_col2:
-                daily_rate = (target / 100) * 2
-                projected_yield = capital * ((1 + daily_rate) ** days_count) if compound_active else capital + (capital * daily_rate * days_count)
-                st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
-                st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
-                
-                viral_text = (
-                    f"🚀 *NEXBOT AI v2.0 - TARGET POSITION HIT!* 🚀\n\n"
-                    f"🔥 *Crypto Asset Node:* {coin_selected}\n"
-                    f"🎯 *Price Target Boundaries:* ${p_start} ➡️ ${p_end}\n"
-                    f"📈 *Today's Cycle Yield:* +{round(st.session_state.daily_profit, 4)} USDT\n"
-                    f"👑 *TOTAL CUMULATIVE NETWORK PROFIT:* +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
-                    f"👉 *Register via my Direct Secure Link:* https://streamlit.app"
-                )
-                encoded_text = urllib.parse.quote(viral_text)
-                whatsapp_url = f"https://whatsapp.com{encoded_text}"
-                st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
-
-    # ----------------------------------------------------
-    # 📜 PAGE 2: MEMBERSHIP LEDGER PAGE
-    # ----------------------------------------------------
-    elif app_mode == "📜 Membership Ledger":
-        st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger Terminal</h2>", unsafe_allow_html=True)
-        st.divider()
-        st.info("👤 **User Node Account Registration Summary:**\n\n📜 Plan Category: 1-Year Premium Access License\n✅ Status: ACTIVE\n💰 Paid Fee: 25.00 USDT")
-
-    # ----------------------------------------------------
-    # 🎛️ PAGE 3: ROYAL Q QUANT SETTINGS (THE ULTIMATE 4-COLUMN INLINE CLEAN ENGINE)
-    # ----------------------------------------------------
-    elif app_mode == "🎛️ Royal Q Quant Settings":
-        st.markdown("<h2 style='color: #00E5FF;'>🎛️ Royal Q Advanced Quant Parameter Console</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #8B949E;'>30-LAYER MARTINGALE HIGH-FREQUENCY DCA EMPTY FORM GRID</p>", unsafe_allow_html=True)
-        st.divider()
-
-        st.markdown("<h4 style='color: #FFB300;'>📊 CUSTOM 30 OPTIONS MARGIN CALL GRID SHEET</h4>", unsafe_allow_html=True)
-        st.caption("यूज़र अपनी पसंद के अनुसार नीचे दिए गए पूरे 30 लेवेल्स के खाली डिब्बों (USDT, Target, Down, Stop-loss) को खुद मैन्युअल टाइप करके भरेगा:")
-        st.write("")
-
-        # ✅ PERFECT FIXED CLEAN INLINE RENDERING FOR ALL 30 OPTIONS LAYER BY LAYER
+            p_
