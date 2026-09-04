@@ -129,4 +129,143 @@ else:
             capital = float(usdt_val) if usdt_val else 30.0
             target = float(target_val) if target_val else 0.5
             days_count = int(days_input) if days_input else 365
-            p_
+            p_start = float(price_from) if price_from else 4000.0
+            p_end = float(price_to) if price_to else 5000.0
+            
+            st.markdown("### 📊 Live Network Strategy Summary Box Matrix")
+            box_col1, box_col2 = st.columns(2)
+            with box_col1:
+                st.info(f"💰 *Today's Daily Cycle Profit:* {round(st.session_state.daily_profit, 4)} USDT")
+                st.warning(f"⛽ *Independent Fuel Wallet Balance:* {round(st.session_state.fuel_wallet, 4)} USDT")
+                st.code(f"📦 Total Capital Allocated: {capital} USDT\n🪙 Active Blockchain Asset: {coin_selected}\n🎯 Position Hit Boundaries: From ${p_start} To ${p_end}\n🛠️ Enforced Margin Parameters: {margin_in}")
+            
+            with box_col2:
+                daily_rate = (target / 100) * 2
+                projected_yield = capital * ((1 + daily_rate) ** days_count) if compound_active else capital + (capital * daily_rate * days_count)
+                st.markdown("<div style='background-color:#004D40; padding:15px; border-radius:10px; color:white; font-weight:bold; text-align:center;'>🎉 CONGRATULATION! STRATEGY TARGET HIT! 🎉</div>", unsafe_allow_html=True)
+                st.metric(label=f"👑 Custom Projections Yield Matrix ({days_count} Days Total)", value=f"{round(projected_yield, 2)} USDT")
+                
+                viral_text = (
+                    f"🚀 NEXBOT AI v2.0 - TARGET POSITION HIT! 🚀\n\n"
+                    f"🔥 Crypto Asset Node: {coin_selected}\n"
+                    f"🎯 Price Target Boundaries: ${p_start} ➡️ ${p_end}\n"
+                    f"📈 Today's Cycle Yield: +{round(st.session_state.daily_profit, 4)} USDT\n"
+                    f"👑 TOTAL CUMULATIVE NETWORK PROFIT: +{round(st.session_state.total_profit, 2)} USDT 🔥\n\n"
+                    f"👉 Register via my Direct Secure Link: https://streamlit.app"
+                )
+                encoded_text = urllib.parse.quote(viral_text)
+                whatsapp_url = f"https://wa.me/?text={encoded_text}"
+                st.markdown(f"<a href='{whatsapp_url}' target='_blank'><button style='width:100%; padding:10px; background-color:#25D366; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;'>SHARE PERFORMANCE ON WHATSAPP ✅</button></a>", unsafe_allow_html=True)
+
+    # ----------------------------------------------------
+    # 📜 PAGE 2: MEMBERSHIP LEDGER PAGE
+    # ----------------------------------------------------
+    elif app_mode == "📜 Membership Ledger":
+        st.markdown("<h2 style='color: #FFB300;'>📜 System Membership Ledger Terminal</h2>", unsafe_allow_html=True)
+        st.divider()
+        st.info("👤 *User Node Account Registration Summary:*\n\n📜 Plan Category: 1-Year Premium Access License\n✅ Status: ACTIVE\n💰 Paid Fee: 25.00 USDT")
+
+    # ----------------------------------------------------
+    # 🎛️ PAGE 3: ROYAL Q QUANT SETTINGS (COMPLETE 30 LEVEL GRID)
+    # ----------------------------------------------------
+    elif app_mode == "🎛️ Royal Q Quant Settings":
+        st.markdown("<h2 style='color: #00E5FF;'>🎛️ Royal Q Advanced Quant Parameter Console</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #8B949E;'>30-LAYER MARTINGALE HIGH-FREQUENCY DCA EMPTY FORM GRID</p>", unsafe_allow_html=True)
+        st.divider()
+
+        st.markdown("<h4 style='color: #FFB300;'>📊 CUSTOM 30 OPTIONS MARGIN CALL GRID SHEET</h4>", unsafe_allow_html=True)
+        st.caption("यूज़र अपनी पसंद के अनुसार नीचे दिए गए पूरे 30 लेवेल्स के खाली डिब्बों (USDT, Target, Down, Stop-loss) को खुद मैन्युअल टाइप करके भरेगा। Stop Loss optional है।")
+        st.write("")
+
+        # Session state mein grid data store karne ke liye
+        if "royal_q_grid" not in st.session_state:
+            st.session_state.royal_q_grid = [
+                {"usdt": "", "target": "", "down": "", "stoploss": ""} for _ in range(30)
+            ]
+
+        # Header
+        h1, h2, h3, h4, h5 = st.columns([0.8, 1.5, 1.5, 1.5, 1.5])
+        h1.markdown("*Level*")
+        h2.markdown("*USDT Amount*")
+        h3.markdown("*Target %*")
+        h4.markdown("*Down %*")
+        h5.markdown("*Stop Loss %* (Optional)")
+
+        st.markdown("---")
+
+        # 30 Levels ke inputs
+        for i in range(30):
+            c1, c2, c3, c4, c5 = st.columns([0.8, 1.5, 1.5, 1.5, 1.5])
+            
+            with c1:
+                st.markdown(f"*#{i+1}*")
+            
+            with c2:
+                st.session_state.royal_q_grid[i]["usdt"] = st.text_input(
+                    f"USDT {i+1}", 
+                    value=st.session_state.royal_q_grid[i]["usdt"], 
+                    key=f"usdt_{i}",
+                    label_visibility="collapsed",
+                    placeholder="e.g. 10"
+                )
+            
+            with c3:
+                st.session_state.royal_q_grid[i]["target"] = st.text_input(
+                    f"Target {i+1}", 
+                    value=st.session_state.royal_q_grid[i]["target"], 
+                    key=f"target_{i}",
+                    label_visibility="collapsed",
+                    placeholder="e.g. 1.5"
+                )
+            
+            with c4:
+                st.session_state.royal_q_grid[i]["down"] = st.text_input(
+                    f"Down {i+1}", 
+                    value=st.session_state.royal_q_grid[i]["down"], 
+                    key=f"down_{i}",
+                    label_visibility="collapsed",
+                    placeholder="e.g. 2.0"
+                )
+            
+            with c5:
+                st.session_state.royal_q_grid[i]["stoploss"] = st.text_input(
+                    f"SL {i+1}", 
+                    value=st.session_state.royal_q_grid[i]["stoploss"], 
+                    key=f"sl_{i}",
+                    label_visibility="collapsed",
+                    placeholder="Optional"
+                )
+
+        st.write("")
+        st.divider()
+
+        # Activate Button
+        col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+        with col_btn2:
+            activate_btn = st.button("💾 SAVE & ACTIVATE STRATEGY", type="primary", use_container_width=True)
+
+        if activate_btn:
+            # Check kitne levels filled hain
+            filled_levels = 0
+            for level in st.session_state.royal_q_grid:
+                if level["usdt"].strip() and level["target"].strip() and level["down"].strip():
+                    filled_levels += 1
+
+            if filled_levels == 0:
+                st.error("❌ Kam se kam 1 level toh bharo (USDT + Target + Down zaroori hai)")
+            else:
+                st.session_state.royal_q_active = True
+                st.session_state.royal_q_filled_count = filled_levels
+                st.success(f"✅ Strategy Activated Successfully! Total {filled_levels} levels configured.")
+                st.balloons()
+                st.rerun()
+
+        # Active status dikhana
+        if st.session_state.get("royal_q_active", False):
+            st.success(f"🟢 *Royal Q Strategy is LIVE* | {st.session_state.get('royal_q_filled_count', 0)} Levels Active")
+            
+            with st.expander("📋 View Active Configuration"):
+                for idx, level in enumerate(st.session_state.royal_q_grid):
+                    if level["usdt"].strip():
+                        sl_text = level["stoploss"] if level["stoploss"].strip() else "Not Set"
+                        st.write(f"*Level {idx+1}* → USDT: {level['usdt']} | Target: {level['target']}% | Down: {level['down']}% | SL: {sl_text}")
