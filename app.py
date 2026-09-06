@@ -169,8 +169,25 @@ else:
             st.markdown("**Entry Price → Target Price**")
             st.text_input("range", value="4000 - 5000", key="price_range", label_visibility="collapsed", placeholder="Example: 70000 - 71000")
         with p2:
-            st.markdown("**🎯 Target Profit Hit**")
-            st.text_input("profit", value=f"{round(live_profit, 4)} USDT", key="live_profit", disabled=True, label_visibility="collapsed")
+    st.markdown("**🎯 Target Profit Hit**")
+    st.markdown(
+        f"""
+        <div style="
+            background-color: #1e1e2f;
+            border: 1px solid #00E5FF55;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00FFCC;
+            margin-top: 5px;
+        ">
+            {round(live_profit, 4)} USDT
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
         compound = st.checkbox("♻️ Auto-Compound Growth", value=True)
 
