@@ -108,19 +108,17 @@ else:
         "👑 Owner Panel"
     ])
 
-    # ====================== TRADING CORE SUITE (CALCULATOR) ======================
+    # ====================== TRADING CORE SUITE ======================
     if app_mode == "🤖 Trading Core Suite":
         st.markdown("<h2 style='color:#00E5FF;'>🤖 NEXBOT AI • Trading Core Suite</h2>", unsafe_allow_html=True)
         st.caption("Advanced Strategy Calculator + Research Based Projections")
 
-        # Live Hits
         st.markdown("### 🔥 Live Coin Hit List")
         for item in binance_live_hit_list:
             st.markdown(f"**{item['coin']}** | <span style='color:#00E676'>{item['gain']}</span> | *{item['status']}*", unsafe_allow_html=True)
 
         st.divider()
 
-        # Presets
         st.markdown("### ⚡ Quick Presets")
         p1, p2, p3 = st.columns(3)
         with p1:
@@ -138,7 +136,6 @@ else:
 
         default_ratio = st.session_state.get("preset_ratio", "0.5")
 
-        # Parameters
         st.markdown("### 📊 Strategy Parameters")
         c1, c2, c3, c4 = st.columns(4)
         with c1:
@@ -162,36 +159,34 @@ else:
         except:
             capital, ratio, days, live_profit = 30.0, 0.5, 365, 0.0
 
-        # Price & Profit
         st.markdown("### 🎯 Price Range & Live Profit")
         p1, p2 = st.columns([2, 1])
         with p1:
             st.markdown("**Entry Price → Target Price**")
             st.text_input("range", value="4000 - 5000", key="price_range", label_visibility="collapsed", placeholder="Example: 70000 - 71000")
         with p2:
-    st.markdown("**🎯 Target Profit Hit**")
-    st.markdown(
-        f"""
-        <div style="
-            background-color: #1e1e2f;
-            border: 1px solid #00E5FF55;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #00FFCC;
-            margin-top: 5px;
-        ">
-            {round(live_profit, 4)} USDT
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            st.markdown("**🎯 Target Profit Hit**")
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: #1e1e2f;
+                    border: 1px solid #00E5FF55;
+                    border-radius: 8px;
+                    padding: 10px;
+                    text-align: center;
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #00FFCC;
+                    margin-top: 5px;
+                ">
+                    {round(live_profit, 4)} USDT
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
         compound = st.checkbox("♻️ Auto-Compound Growth", value=True)
 
-        # Launch Button
         if st.button("🚀 ENTER & LAUNCH STRATEGY", type="primary", use_container_width=True):
             daily_profit = live_profit
             st.session_state.daily_profit = daily_profit
@@ -210,7 +205,6 @@ else:
             st.balloons()
             st.rerun()
 
-        # Results Section
         if st.session_state.daily_profit > 0:
             st.divider()
             st.markdown("### 📈 Live Results & Research Based Projection")
@@ -224,7 +218,6 @@ else:
             m3.metric("Risk Level", risk)
             m4.metric("Your Net Profit", f"{round(st.session_state.total_profit,2)} USDT")
 
-            # Projection
             if compound:
                 projected = capital * ((1 + ratio/100) ** days)
             else:
@@ -232,7 +225,6 @@ else:
 
             st.markdown(f"#### 🔮 Projected Value after {days} days: **{round(projected,2)} USDT**")
 
-            # Chart
             growth = []
             curr = capital
             step = max(1, days // 12)
