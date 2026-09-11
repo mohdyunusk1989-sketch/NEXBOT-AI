@@ -2,83 +2,75 @@ import streamlit as st
 import pandas as pd
 import urllib.parse
 from datetime import datetime
+from binance.client import Client
 
-st.set_page_config(
-    page_title="NexBot AI - Institutional Elite",
-    page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="NexBot AI", page_icon="🤖", layout="wide", initial_sidebar_state="expanded")
+
+# ====================== API KEYS ======================
+API_KEY = "f79GlppYGMwTMdfKJdVZdSeIcugbam6hca0omva71gg8pHyhHc3p4dB6MgiFbnvH"
+API_SECRET = "cM2OuD31KMzpsL1AG7Ivlf8b8nS9vjZC13yHqeeFuqfBl80bdZNzQIxnaCnTt7Wi"
 
 # ====================== CSS ======================
 st.markdown("""
 <style>
-    .stApp {
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        color: #ffffff;
+    .stApp { background: linear-gradient(135deg, #0b0e1a, #1a1a2e, #16213e); color: #e0e0e0; }
+    section[data-testid="stSidebar"] { background: linear-gradient(180deg, #0f172a, #1e293b); border-right: 1px solid #334155; }
+    h1, h2, h3, h4 { color: #38bdf8 !important; }
+    .stTextInput label, .stNumberInput label, .stSelectbox label {
+        color: #7dd3fc !important; font-weight: 600 !important; font-size: 14px !important;
     }
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a1a2e, #16213e);
-        border-right: 1px solid #00E5FF33;
-    }
-    h1, h2, h3, h4 { color: #00E5FF !important; }
-    .stTextInput input, .stSelectbox div[data-baseweb="select"] {
-        background-color: #1e1e2f !important;
-        color: #00FFCC !important;
-        border: 1px solid #00E5FF55 !important;
-        border-radius: 8px !important;
-        text-align: center !important;
-        font-weight: bold !important;
+    .stTextInput input, .stNumberInput input {
+        background-color: #1e293b !important; color: #f0f9ff !important;
+        border: 1px solid #38bdf8 !important; border-radius: 8px !important;
     }
     .stButton > button {
-        background: linear-gradient(90deg, #FF1744, #D500F9) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 10px !important;
+        background: linear-gradient(90deg, #e11d48, #7c3aed) !important;
+        color: white !important; border: none !important; border-radius: 10px !important;
         font-weight: bold !important;
     }
-    [data-testid="stMetricValue"] { color: #00E676 !important; }
+    [data-testid="stMetricValue"] { color: #4ade80 !important; }
     #MainMenu, footer {visibility: hidden;}
-    label { color: #00E5FF !important; font-weight: bold !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# ====================== DATA ======================
-binance_all_coins = ["SOL/USDT", "BTC/USDT", "ETH/USDT", "XRP/USDT", "ADA/USDT", "DOGE/USDT", "NEAR/USDT", "BNB/USDT"]
-binance_live_hit_list = [
-    {"coin": "🔥 SOL/USDT", "gain": "+12.45%", "status": "Strong Bullish 🚀"},
-    {"coin": "🔥 NEAR/USDT", "gain": "+9.12%", "status": "Target Boundary Break ⚡"},
-    {"coin": "🔥 DOGE/USDT", "gain": "+7.84%", "status": "High Volume Surge 📈"},
-    {"coin": "🔥 BTC/USDT", "gain": "+4.21%", "status": "Steady Climb 📊"},
-]
+# ====================== BINANCE ======================
+def get_client():
+    try: return Client(API_KEY, API_SECRET)
+    except: return None
 
-# ====================== SESSION STATE ======================
+def get_balance(client):
+    try:
+        acc = client.get_account()
+        return [{"asset": b["asset"], "free": float(b["free"])} for b in acc["balances"] if float(b["free"]) > 0]
+    except: return []
+
+def get_price(client, symbol="BTCUSDT"):
+    try: return float(client.get_symbol_ticker(symbol=symbol)["price"])
+    except: return None
+
+# ====================== SESSION ======================
 defaults = {
     "authenticated": False,
     "owner_income": 0.0,
-    "fuel_wallet": 10.0,
     "total_profit": 0.0,
-    "daily_profit": 0.0,
-    "binance_connected": False,
-    "profit_history": [],
+    "paper_balance": 1000.0,
     "referral_code": "NEXBOT4348",
-    "activated_users": [],
+    "referral_count": 0,
     "grid_running": False,
     "auto_compound": True,
-    "grid_levels": [{"base_usdt": "", "current_usdt": 0.0, "target": "", "down": "", "stoploss": "", "profit": 0.0} for _ in range(30)],
+    "session1_active": False,
+    "session2_active": False,
 }
-for key, val in defaults.items():
-    if key not in st.session_state:
-        st.session_state[key] = val
+for k, v in defaults.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
 
 MASTER_PIN = "8312"
 OWNER_PIN = "Aqsa@7860"
 
 # ====================== LOGIN ======================
 if not st.session_state.authenticated:
-    st.markdown("<h1 style='text-align:center; color:#FF1744;'>🔒 NEXBOT SECURITY GATEWAY</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center; color:#aaa;'>Private Encrypted Node • Institutional Access Only</p>", unsafe_allow_html=True)
-    
+    st.markdown("<h1 style='text-align:center;color:#f43f5e;'>🔒 NEXBOT SECURITY GATEWAY</h1>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns([1,2,1])
     with c2:
         pin = st.text_input("Enter Security PIN", type="password")
@@ -87,334 +79,215 @@ if not st.session_state.authenticated:
                 st.session_state.authenticated = True
                 st.rerun()
             else:
-                st.error("❌ Invalid PIN")
+                st.error("Wrong PIN")
 else:
-    # ====================== SIDEBAR ======================
-    st.sidebar.markdown("### 🧭 Compass NexBot")
-    st.sidebar.markdown(f"**👑 Owner Vault:** `{round(st.session_state.owner_income, 2)} USDT`")
-    st.sidebar.markdown(f"**⛽ Fuel Wallet:** `{round(st.session_state.fuel_wallet, 2)} USDT`")
-    st.sidebar.markdown(f"**🔗 Referral:** `{st.session_state.referral_code}`")
-    
-    status = "🟢 RUNNING" if st.session_state.grid_running else "🔴 STOPPED"
-    st.sidebar.markdown(f"**Grid Status:** {status}")
+    client = get_client()
 
-    app_mode = st.sidebar.selectbox("Navigation Menu", [
-        "🤖 Trading Core Suite",
-        "📜 Membership Ledger",
-        "🎛️ NexBot Smart Grid Pro",
-        "⚙️ Smart Compound Engine",
-        "🔗 Binance Connect",
-        "👥 Referral System",
+    # ====================== SIDEBAR ======================
+    st.sidebar.markdown("### 🧭 NexBot Control")
+    st.sidebar.markdown(f"**👑 Owner Vault:** `{st.session_state.owner_income:.2f} USDT`")
+    st.sidebar.markdown(f"**📄 Paper Balance:** `{st.session_state.paper_balance:.2f} USDT`")
+    st.sidebar.markdown(f"**🔗 Referral:** `{st.session_state.referral_code}`")
+    st.sidebar.markdown(f"**👥 Joined:** `{st.session_state.referral_count}`")
+
+    if client:
+        bals = get_balance(client)
+        if bals:
+            st.sidebar.markdown("### 💰 Real Balance")
+            for b in bals[:5]:
+                st.sidebar.write(f"**{b['asset']}**: {b['free']:.4f}")
+
+    page = st.sidebar.selectbox("Menu", [
+        "🤖 Trading Core",
+        "🎛️ Smart Grid Pro",
+        "⏰ Dual Session Hunter",
+        "👥 Referral + Share",
+        "📄 Paper Trading",
         "👑 Owner Panel"
     ])
 
-    # ====================== TRADING CORE SUITE ======================
-    if app_mode == "🤖 Trading Core Suite":
-        st.markdown("<h2 style='color:#00E5FF;'>🤖 NEXBOT AI • Trading Core Suite</h2>", unsafe_allow_html=True)
-        st.caption("Advanced Strategy Calculator + Research Based Projections")
+    # ====================== TRADING CORE ======================
+    if page == "🤖 Trading Core":
+        st.markdown("## 🤖 Trading Core Suite")
 
-        st.markdown("### 🔥 Live Coin Hit List")
-        for item in binance_live_hit_list:
-            st.markdown(f"**{item['coin']}** | <span style='color:#00E676'>{item['gain']}</span> | *{item['status']}*", unsafe_allow_html=True)
+        if client:
+            cols = st.columns(4)
+            for i, sym in enumerate(["SOLUSDT", "BTCUSDT", "ETHUSDT", "BNBUSDT"]):
+                price = get_price(client, sym)
+                cols[i].metric(sym.replace("USDT","/USDT"), f"${price:,.2f}" if price else "—")
 
         st.divider()
+        st.markdown("### 📊 Strategy Calculator")
 
-        st.markdown("### ⚡ Quick Presets")
-        p1, p2, p3 = st.columns(3)
-        with p1:
-            if st.button("🛡️ Safe (0.4%)", use_container_width=True):
-                st.session_state.preset_ratio = "0.4"
-                st.rerun()
-        with p2:
-            if st.button("⚖️ Balanced (0.7%)", use_container_width=True):
-                st.session_state.preset_ratio = "0.7"
-                st.rerun()
-        with p3:
-            if st.button("🔥 Aggressive (1.2%)", use_container_width=True):
-                st.session_state.preset_ratio = "1.2"
-                st.rerun()
-
-        default_ratio = st.session_state.get("preset_ratio", "0.5")
-
-        st.markdown("### 📊 Strategy Parameters")
         c1, c2, c3, c4 = st.columns(4)
-        with c1:
-            st.markdown("**Capital (USDT)**")
-            usdt_val = st.text_input("cap", value="30", key="cap", label_visibility="collapsed")
-        with c2:
-            st.markdown("**Target Days**")
-            days_input = st.text_input("days", value="365", key="days", label_visibility="collapsed")
-        with c3:
-            st.markdown("**Daily Ratio %**")
-            target_val = st.text_input("ratio", value=default_ratio, key="ratio", label_visibility="collapsed")
-        with c4:
-            st.markdown("**Crypto Token**")
-            coin_selected = st.selectbox("token", binance_all_coins, key="coin", label_visibility="collapsed")
+        capital = c1.number_input("Capital (USDT)", value=30.0, min_value=1.0)
+        target_pct = c2.number_input("Target %", value=0.7, min_value=0.1, step=0.1)
+        down_pct = c3.number_input("Down %", value=1.0, min_value=0.1, step=0.1)
+        symbol = c4.selectbox("Coin", ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"])
 
-        try:
-            capital = float(usdt_val)
-            ratio = float(target_val)
-            days = int(days_input)
-            live_profit = capital * (ratio / 100)
-        except:
-            capital, ratio, days, live_profit = 30.0, 0.5, 365, 0.0
+        current_price = get_price(client, symbol) if client else 70000
+        if current_price:
+            target_price = current_price * (1 + target_pct/100)
+            down_price = current_price * (1 - down_pct/100)
 
-        st.markdown("### 🎯 Price Range & Live Profit")
-        p1, p2 = st.columns([2, 1])
-        with p1:
-            st.markdown("**Entry Price → Target Price**")
-            st.text_input("range", value="4000 - 5000", key="price_range", label_visibility="collapsed", placeholder="Example: 70000 - 71000")
-        with p2:
-            st.markdown("**🎯 Target Profit Hit**")
-            st.markdown(
-                f"""
-                <div style="
-                    background-color: #1e1e2f;
-                    border: 1px solid #00E5FF55;
-                    border-radius: 8px;
-                    padding: 10px;
-                    text-align: center;
-                    font-size: 18px;
-                    font-weight: bold;
-                    color: #00FFCC;
-                    margin-top: 5px;
-                ">
-                    {round(live_profit, 4)} USDT
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown("### 🎯 Price Range")
+            col_a, col_b, col_c = st.columns(3)
+            col_a.metric("Current Price", f"${current_price:,.2f}")
+            col_b.metric("Target Price", f"${target_price:,.2f}")
+            col_c.metric("Down Price", f"${down_price:,.2f}")
+            st.success(f"**Range:** {down_price:,.0f} — {target_price:,.0f}")
 
-        compound = st.checkbox("♻️ Auto-Compound Growth", value=True)
+            profit = capital * (target_pct / 100)
+            st.metric("💰 Expected Profit", f"{profit:.4f} USDT")
 
-        if st.button("🚀 ENTER & LAUNCH STRATEGY", type="primary", use_container_width=True):
-            daily_profit = live_profit
-            st.session_state.daily_profit = daily_profit
-            owner_share = daily_profit * 0.05
-            st.session_state.owner_income += owner_share
-            st.session_state.total_profit += (daily_profit - owner_share)
+            if st.button("🚀 Launch Strategy", type="primary", use_container_width=True):
+                st.session_state.owner_income += profit * 0.05
+                st.session_state.total_profit += profit * 0.95
+                st.success(f"Strategy Launched! Profit: {profit:.4f} USDT")
+                st.balloons()
 
-            st.session_state.profit_history.append({
-                "capital": capital,
-                "ratio": ratio,
-                "daily": round(daily_profit, 4),
-                "coin": coin_selected,
-                "time": datetime.now().strftime("%H:%M")
-            })
-            st.success(f"✅ Strategy Launched! Daily Profit: **{round(daily_profit,4)} USDT**")
-            st.balloons()
-            st.rerun()
-
-        if st.session_state.daily_profit > 0:
-            st.divider()
-            st.markdown("### 📈 Live Results & Research Based Projection")
-
-            realistic_monthly = ratio * 22
-            risk = "Low 🟢" if ratio <= 0.5 else "Medium 🟡" if ratio <= 0.9 else "High 🔴"
-
-            m1, m2, m3, m4 = st.columns(4)
-            m1.metric("Daily Profit", f"{round(st.session_state.daily_profit,4)} USDT")
-            m2.metric("Realistic Monthly", f"{round(realistic_monthly,1)}%")
-            m3.metric("Risk Level", risk)
-            m4.metric("Your Net Profit", f"{round(st.session_state.total_profit,2)} USDT")
-
-            if compound:
-                projected = capital * ((1 + ratio/100) ** days)
-            else:
-                projected = capital + (capital * ratio/100 * days)
-
-            st.markdown(f"#### 🔮 Projected Value after {days} days: **{round(projected,2)} USDT**")
-
-            growth = []
-            curr = capital
-            step = max(1, days // 12)
-            for d in range(0, days+1, step):
-                growth.append({"Day": d, "Value": round(curr, 2)})
-                curr = curr * (1 + ratio/100) if compound else curr + capital * ratio/100
-            st.line_chart(pd.DataFrame(growth).set_index("Day"))
-
-            # WhatsApp Share
-            st.markdown("### 📤 Share Your Result")
-            share_text = f"""🚀 *NexBot AI - Profit Update!*
-
-💰 Capital: {capital} USDT
-📈 Daily Ratio: {ratio}%
-🎯 Today's Profit: {round(st.session_state.daily_profit,4)} USDT
-👑 Total Net Profit: {round(st.session_state.total_profit,2)} USDT
-🔮 {days} Days Projection: {round(projected,2)} USDT
-
-🔗 Join with my code: *{st.session_state.referral_code}*
-"""
-            encoded = urllib.parse.quote(share_text)
-            whatsapp_url = f"https://wa.me/?text={encoded}"
-            st.markdown(f'<a href="{whatsapp_url}" target="_blank"><button style="background:#25D366;color:white;padding:12px 24px;border:none;border-radius:8px;font-weight:bold;width:100%;cursor:pointer;">📲 Share on WhatsApp</button></a>', unsafe_allow_html=True)
-
-            st.warning("⚠️ **DISCLAIMER** — Yeh calculation tool hai. Koi guaranteed profit nahi hai. Market risk hai.")
-
-        if st.session_state.profit_history:
-            with st.expander("📜 Recent History"):
-                for h in reversed(st.session_state.profit_history[-6:]):
-                    st.write(f"• {h['time']} | {h['coin']} | {h['capital']} USDT | {h['ratio']}% | Profit: {h['daily']}")
-
-    # ====================== MEMBERSHIP ======================
-    elif app_mode == "📜 Membership Ledger":
-        st.markdown("<h2 style='color:#FFB300;'>📜 Membership Ledger</h2>", unsafe_allow_html=True)
-        st.success("""
-        ### 👤 Membership Status
-        - **Plan:** 1-Year Premium  
-        - **Fee:** **30 USDT**  
-        - **Distribution:** 20 USDT → Owner | 10 USDT → Direct Referrer  
-        - **Status:** ✅ ACTIVE
-        """)
-
-    # ====================== SMART GRID PRO ======================
-    elif app_mode == "🎛️ NexBot Smart Grid Pro":
-        st.markdown("<h2 style='color:#00E5FF;'>🎛️ NexBot Smart Grid Pro</h2>", unsafe_allow_html=True)
-        st.caption("30-Layer Settings + Control Panel")
-
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.session_state.grid_running = st.toggle("🟢 Grid Running", value=st.session_state.grid_running)
-        with col2:
-            st.session_state.auto_compound = st.toggle("♻️ Auto Compound", value=st.session_state.auto_compound)
-        with col3:
-            st.markdown(f"**Status:** {'🟢 RUNNING' if st.session_state.grid_running else '🔴 STOPPED'}")
-
-        st.divider()
-        h = st.columns([0.6, 1.4, 1.3, 1.3, 1.3])
-        h[0].markdown("**#**")
-        h[1].markdown("**Base USDT**")
-        h[2].markdown("**Target %**")
-        h[3].markdown("**Down %**")
-        h[4].markdown("**Stop Loss**")
-
-        for i in range(30):
-            c1, c2, c3, c4, c5 = st.columns([0.6, 1.4, 1.3, 1.3, 1.3])
-            c1.markdown(f"**{i+1}**")
-            base = c2.text_input(f"b{i}", value=st.session_state.grid_levels[i]["base_usdt"], key=f"base_{i}", label_visibility="collapsed", placeholder="USDT")
-            target = c3.text_input(f"t{i}", value=st.session_state.grid_levels[i]["target"], key=f"tar_{i}", label_visibility="collapsed", placeholder="Target")
-            down = c4.text_input(f"d{i}", value=st.session_state.grid_levels[i]["down"], key=f"down_{i}", label_visibility="collapsed", placeholder="Down")
-            sl = c5.text_input(f"s{i}", value=st.session_state.grid_levels[i]["stoploss"], key=f"sl_{i}", label_visibility="collapsed", placeholder="SL")
-
-            st.session_state.grid_levels[i]["base_usdt"] = base
-            st.session_state.grid_levels[i]["target"] = target
-            st.session_state.grid_levels[i]["down"] = down
-            st.session_state.grid_levels[i]["stoploss"] = sl
-
-            if base.strip() and st.session_state.grid_levels[i]["current_usdt"] == 0.0:
-                try:
-                    st.session_state.grid_levels[i]["current_usdt"] = float(base)
-                except:
-                    pass
-
-        if st.button("💾 SAVE SETTINGS", type="primary", use_container_width=True):
-            st.success("✅ Settings Saved!")
-            st.balloons()
-
-    # ====================== SMART COMPOUND ENGINE ======================
-    elif app_mode == "⚙️ Smart Compound Engine":
-        st.markdown("<h2 style='color:#00E5FF;'>⚙️ Smart Compound Engine</h2>", unsafe_allow_html=True)
+    # ====================== SMART GRID PRO (30 LEVELS) ======================
+    elif page == "🎛️ Smart Grid Pro":
+        st.markdown("## 🎛️ NexBot Smart Grid Pro")
+        st.caption("30-Level Martingale Grid + Auto Compound")
 
         c1, c2, c3 = st.columns(3)
-        c1.markdown(f"### {'🟢 RUNNING' if st.session_state.grid_running else '🔴 STOPPED'}")
-        c2.markdown(f"### Compound: {'✅ ON' if st.session_state.auto_compound else '❌ OFF'}")
-        total_invested = sum(lvl["current_usdt"] for lvl in st.session_state.grid_levels)
-        c3.markdown(f"### Invested: `{round(total_invested,2)} USDT`")
+        st.session_state.grid_running = c1.toggle("🟢 Grid Running", value=st.session_state.grid_running)
+        st.session_state.auto_compound = c2.toggle("♻️ Auto Compound", value=st.session_state.auto_compound)
+        c3.markdown(f"**Status:** {'🟢 RUNNING' if st.session_state.grid_running else '🔴 STOPPED'}")
+
+        st.markdown("### Level Settings")
+        st.caption("Har level pe USDT, Target % aur Down % daalo. Price Range automatic calculate hoga.")
+
+        # Header
+        h = st.columns([0.5, 1.3, 1.2, 1.2, 2])
+        h[0].markdown("**#**")
+        h[1].markdown("**USDT Amount**")
+        h[2].markdown("**Target %**")
+        h[3].markdown("**Down %**")
+        h[4].markdown("**Price Range (BTC)**")
+
+        curr = get_price(client, "BTCUSDT") if client else 70000
+
+        for i in range(30):
+            c1, c2, c3, c4, c5 = st.columns([0.5, 1.3, 1.2, 1.2, 2])
+            c1.markdown(f"**{i+1}**")
+            usdt = c2.number_input("u", value=10.0 if i == 0 else 0.0, key=f"g_usdt_{i}", label_visibility="collapsed", min_value=0.0)
+            target = c3.number_input("t", value=0.7, key=f"g_target_{i}", label_visibility="collapsed", min_value=0.1)
+            down = c4.number_input("d", value=1.0, key=f"g_down_{i}", label_visibility="collapsed", min_value=0.1)
+
+            if curr and usdt > 0:
+                t_price = curr * (1 + target/100)
+                d_price = curr * (1 - down/100)
+                c5.markdown(f"**{d_price:,.0f} — {t_price:,.0f}**")
+            else:
+                c5.write("—")
+
+        if st.button("💾 Save Grid Settings", type="primary", use_container_width=True):
+            st.success("✅ 30 Level Grid Settings Saved!")
+            st.balloons()
+
+    # ====================== DUAL SESSION HUNTER ======================
+    elif page == "⏰ Dual Session Hunter":
+        st.markdown("## ⏰ Dual Session Hunter")
+        st.caption("Din mein 2 baar automatic entry system")
+
+        st.markdown("### Common Settings")
+        c1, c2, c3, c4 = st.columns(4)
+        capital = c1.number_input("USDT Amount", value=20.0, key="ds_capital")
+        target = c2.number_input("Target %", value=0.7, key="ds_target")
+        down = c3.number_input("Down %", value=1.0, key="ds_down")
+        coin1 = c4.selectbox("Session 1 Coin", ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"], key="coin1")
+
+        coin2 = st.selectbox("Session 2 Coin", ["ETHUSDT", "SOLUSDT", "BNBUSDT", "BTCUSDT"], key="coin2")
 
         st.divider()
-        h = st.columns([0.5, 1.2, 1.2, 1.2, 1.2, 1.2])
-        for col, name in zip(h, ["#", "Base", "Current", "Profit", "Next Order", "Target %"]):
-            col.markdown(f"**{name}**")
+        col1, col2 = st.columns(2)
 
-        total_profit = 0.0
-        for i, lvl in enumerate(st.session_state.grid_levels):
-            base = lvl["base_usdt"]
-            current = lvl["current_usdt"]
-            profit = lvl["profit"]
-            next_order = round(current + profit, 4) if st.session_state.auto_compound and current > 0 else (float(base) if base.strip() else 0)
-            total_profit += profit
+        with col1:
+            st.markdown("#### 🌅 Session 1 — 12:00 AM")
+            st.write("Bot raat 12 baje se wait karega")
+            st.write("Price niche aate hi entry lega")
+            st.session_state.session1_active = st.toggle("Activate Session 1", value=st.session_state.session1_active, key="s1")
 
-            c = st.columns([0.5, 1.2, 1.2, 1.2, 1.2, 1.2])
-            c[0].markdown(f"**{i+1}**")
-            c[1].write(base or "-")
-            c[2].write(round(current,4) if current else "-")
-            c[3].write(round(profit,4) if profit else "-")
-            c[4].write(f"**{next_order}**" if next_order else "-")
-            c[5].write(lvl["target"] or "-")
+        with col2:
+            st.markdown("#### 🌞 Session 2 — 1:00 PM")
+            st.write("Bot dopahar 1 baje se wait karega")
+            st.write("Niche aane ke baad 3 min wait → entry")
+            st.session_state.session2_active = st.toggle("Activate Session 2", value=st.session_state.session2_active, key="s2")
 
-        st.metric("💰 Total Profit", f"{round(total_profit,4)} USDT")
+        st.divider()
+        profit = capital * (target / 100)
+        st.metric("Expected Profit (per session)", f"{profit:.4f} USDT")
+        st.metric("Agar dono hit ho", f"{profit*2:.4f} USDT")
 
-        if st.button("🔄 Simulate Profit (Demo)", use_container_width=True):
-            for lvl in st.session_state.grid_levels:
-                if lvl["current_usdt"] > 0:
-                    p = lvl["current_usdt"] * 0.01
-                    lvl["profit"] += p
-                    if st.session_state.auto_compound:
-                        lvl["current_usdt"] += p
-            st.success("Demo profit added!")
-            st.rerun()
+        if st.button("💾 Save Dual Session", type="primary", use_container_width=True):
+            st.success("Dual Session Settings Saved!")
+            st.balloons()
 
-    # ====================== BINANCE ======================
-    elif app_mode == "🔗 Binance Connect":
-        st.markdown("<h2 style='color:#F0B90B;'>🔗 Binance API Connection</h2>", unsafe_allow_html=True)
-        st.warning("⚠️ Keys only for current session. Never give Withdraw permission.")
-        api_key = st.text_input("API Key", type="password")
-        api_secret = st.text_input("Secret Key", type="password")
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("🔌 Connect", use_container_width=True):
-                if api_key and api_secret:
-                    st.session_state.binance_connected = True
-                    st.success("✅ Connected (Demo Mode)")
-                else:
-                    st.error("Enter both keys")
-        with c2:
-            if st.button("Disconnect", use_container_width=True):
-                st.session_state.binance_connected = False
-        if st.session_state.binance_connected:
-            st.success("🟢 Binance Connected")
+    # ====================== REFERRAL + SHARE ======================
+    elif page == "👥 Referral + Share":
+        st.markdown("## 👥 Referral System + WhatsApp Share")
 
-    # ====================== REFERRAL ======================
-    elif app_mode == "👥 Referral System":
-        st.markdown("<h2 style='color:#00E5FF;'>👥 Referral System</h2>", unsafe_allow_html=True)
-        st.success(f"### 🔗 Your Code: `{st.session_state.referral_code}`")
+        st.success(f"### 🔗 Your Referral Code: `{st.session_state.referral_code}`")
+        st.metric("Total People Joined", st.session_state.referral_count)
+
         st.markdown("""
-        **Membership (30 USDT):** Direct → 10 USDT | Owner → 20 USDT  
-
-        **Profit Share:** Owner 5% | L1 5% | L2 4% | L3 3% | L4 2% | L5 1%
+        ### 💰 Income Structure
+        - **Membership (30 USDT):** Direct → 10 USDT | Owner → 20 USDT  
+        - **Profit Share:** Owner 5% | Level 1: 5% | Level 2: 4% | Level 3: 3% | Level 4: 2% | Level 5: 1%
         """)
 
-    # ====================== OWNER PANEL ======================
-    elif app_mode == "👑 Owner Panel":
-        st.markdown("<h2 style='color:#FFD700;'>👑 Owner Panel</h2>", unsafe_allow_html=True)
-        owner_pin = st.text_input("Owner Password", type="password", key="owner_pin")
-        
-        if owner_pin == OWNER_PIN:
-            st.success("✅ Access Granted")
-            d1, d2, d3 = st.columns(3)
-            d1.metric("Activated Users", len(st.session_state.activated_users))
-            d2.metric("Owner Vault", f"{round(st.session_state.owner_income,2)} USDT")
-            d3.metric("Membership Value", f"{len(st.session_state.activated_users)*30} USDT")
+        st.divider()
+        st.markdown("### 📤 Share on WhatsApp")
 
-            st.divider()
-            user_id = st.text_input("User ID / Name")
-            note = st.text_input("Note")
-            if st.button("✅ ACTIVATE USER", type="primary", use_container_width=True):
-                if user_id.strip():
-                    st.session_state.activated_users.append({
-                        "id": user_id.strip(),
-                        "note": note,
-                        "time": datetime.now().strftime("%d-%m-%Y %H:%M")
-                    })
-                    st.session_state.owner_income += 20
-                    st.success(f"✅ {user_id} Activated! +20 USDT")
-                    st.rerun()
+        msg = f"""🚀 *NexBot AI - Smart Trading Bot*
 
-            st.divider()
-            if st.session_state.activated_users:
-                for i, u in enumerate(reversed(st.session_state.activated_users), 1):
-                    st.write(f"**{i}.** `{u['id']}` | {u['time']} | {u['note']}")
+Main NexBot use kar raha hoon.
+Yeh advanced grid + dual session system hai.
+
+🔗 *Mere code se join karo:*
+*{st.session_state.referral_code}*
+
+Saath mein profit kamate hain! 💰"""
+
+        url = "https://wa.me/?text=" + urllib.parse.quote(msg)
+        st.markdown(f'''
+        <a href="{url}" target="_blank">
+            <button style="background:#25D366;color:white;padding:14px;border:none;border-radius:10px;width:100%;font-weight:bold;font-size:16px;cursor:pointer;">
+                📲 Share on WhatsApp
+            </button>
+        </a>
+        ''', unsafe_allow_html=True)
+
+        st.info("Jab koi aapka code use karke join kare, to yahan count badhega (baad mein automatic karenge).")
+
+    # ====================== PAPER TRADING ======================
+    elif page == "📄 Paper Trading":
+        st.markdown("## 📄 Paper Trading")
+        st.info(f"Paper Balance: **{st.session_state.paper_balance:.2f} USDT**")
+
+        c1, c2, c3 = st.columns(3)
+        symbol = c1.selectbox("Symbol", ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"])
+        amount = c2.number_input("Amount (USDT)", value=10.0)
+        side = c3.selectbox("Side", ["BUY", "SELL"])
+
+        if st.button("📝 Place Paper Order", type="primary"):
+            if amount <= st.session_state.paper_balance:
+                st.session_state.paper_balance -= amount
+                st.success(f"Paper {side} order placed: {amount} USDT")
             else:
-                st.info("No users activated yet.")
-        elif owner_pin:
-            st.error("❌ Wrong Password")
+                st.error("Insufficient balance")
+
+    # ====================== OWNER PANEL ======================
+    elif page == "👑 Owner Panel":
+        st.markdown("## 👑 Owner Panel")
+        pin = st.text_input("Owner Password", type="password")
+        if pin == OWNER_PIN:
+            st.success("Access Granted")
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Owner Vault", f"{st.session_state.owner_income:.2f} USDT")
+            c2.metric("Total Profit", f"{st.session_state.total_profit:.2f} USDT")
+            c3.metric("Referrals", st.session_state.referral_count)
+        elif pin:
+            st.error("Wrong Password")
