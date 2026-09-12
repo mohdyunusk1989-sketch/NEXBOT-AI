@@ -114,7 +114,7 @@ for k, v in defaults.items():
 OWNER_PIN = "Aqsa@7860"
 LIVE_LINK = "https://nexbot-ai-q7eycecsypyvxagq8tgcyu.streamlit.app"
 MEMBERSHIP_FEE = 30
-OWNER_PROFIT_SHARE = 0.10   # 10%
+OWNER_PROFIT_SHARE = 0.10
 
 # ====================== LOGIN / REGISTER ======================
 if not st.session_state.logged_in:
@@ -278,7 +278,7 @@ else:
         symbol = c1.selectbox("Symbol", ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"])
         amount = c2.number_input("Amount (USDT)", value=20.0, min_value=1.0)
         side = c3.selectbox("Side", ["BUY", "SELL"])
-        leverage = c4.selectbox("Leverage", ["1x", "2x", "5x", "10x"])
+        leverage = c4.number_input("Leverage (x)", value=1.0, min_value=0.5, max_value=20.0, step=0.5)
 
         if st.button("Place Paper Order", type="primary", use_container_width=True):
             if amount > st.session_state.paper_balance:
@@ -293,14 +293,14 @@ else:
                     "leverage": leverage
                 }
                 st.session_state.paper_trades.append(trade)
-                st.success(f"Paper {side} order placed: {amount} USDT on {symbol}")
+                st.success(f"Paper {side} order placed: {amount} USDT on {symbol} with {leverage}x leverage")
                 st.balloons()
 
         if st.session_state.paper_trades:
             st.divider()
             st.markdown("### Recent Paper Trades")
             for t in reversed(st.session_state.paper_trades[-10:]):
-                st.write(f"{t['time']} | {t['side']} | {t['symbol']} | {t['amount']} USDT | {t['leverage']}")
+                st.write(f"{t['time']} | {t['side']} | {t['symbol']} | {t['amount']} USDT | {t['leverage']}x")
 
     # ====================== SMART GRID ======================
     elif page == "🎛️ Smart Grid Pro":
