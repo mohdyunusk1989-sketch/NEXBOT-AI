@@ -11,14 +11,13 @@ st.set_page_config(page_title="NexBot AI", page_icon="🤖", layout="wide", init
 # ====================== SUPABASE ======================
 SUPABASE_URL = "https://uktmbjwcsqgdciwuprhp.supabase.co"
 SUPABASE_KEY = "sb_publishable_SWlh8SwyNlRZBCtGDUkyeg_pfGlyJr1"
-
 supabase: SupabaseClient = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ====================== BINANCE ======================
 API_KEY = "f79GlppYGMwTMdfKJdVZdSeIcugbam6hca0omva71gg8pHyhHc3p4dB6MgiFbnvH"
 API_SECRET = "cM2OuD31KMzpsL1AG7Ivlf8b8nS9vjZC13yHqeeFuqfBl80bdZNzQIxnaCnTt7Wi"
 
-# ====================== TRC20 WALLET ======================
+# ====================== TRC20 ======================
 TRC20_WALLET = "TYourWalletAddressHere"
 
 # ====================== CSS ======================
@@ -47,16 +46,12 @@ st.markdown("""
 
 # ====================== HELPERS ======================
 def get_client():
-    try:
-        return Client(API_KEY, API_SECRET)
-    except:
-        return None
+    try: return Client(API_KEY, API_SECRET)
+    except: return None
 
 def get_price(client, symbol="BTCUSDT"):
-    try:
-        return float(client.get_symbol_ticker(symbol=symbol)["price"])
-    except:
-        return None
+    try: return float(client.get_symbol_ticker(symbol=symbol)["price"])
+    except: return None
 
 def generate_referral_code():
     return "NEXBOT" + "".join(random.choices(string.digits, k=4))
@@ -64,67 +59,52 @@ def generate_referral_code():
 def get_user_by_mobile(mobile):
     try:
         res = supabase.table("users").select("*").eq("mobile", mobile).execute()
-        if res.data:
-            return res.data[0]
-        return None
-    except:
-        return None
+        return res.data[0] if res.data else None
+    except: return None
 
 def create_user(name, mobile, password, referral_code, used_referral):
     try:
         data = {
-            "name": name,
-            "mobile": mobile,
-            "password": password,
-            "referral_code": referral_code,
-            "used_referral": used_referral,
-            "membership": False,
-            "joined": datetime.now().strftime("%d-%m-%Y %H:%M")
+            "name": name, "mobile": mobile, "password": password,
+            "referral_code": referral_code, "used_referral": used_referral,
+            "membership": False, "joined": datetime.now().strftime("%d-%m-%Y %H:%M")
         }
-        res = supabase.table("users").insert(data).execute()
+        supabase.table("users").insert(data).execute()
         return True
-    except Exception as e:
-        st.error(f"Error: {e}")
-        return False
+    except: return False
 
 def update_membership(mobile, status=True):
     try:
         supabase.table("users").update({"membership": status}).eq("mobile", mobile).execute()
         return True
-    except:
-        return False
+    except: return False
 
 def get_all_users():
     try:
         res = supabase.table("users").select("*").execute()
         return res.data
-    except:
-        return []
+    except: return []
 
 # ====================== SESSION ======================
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "current_user" not in st.session_state:
-    st.session_state.current_user = None
-if "paper_balance" not in st.session_state:
-    st.session_state.paper_balance = 1000.0
-if "paper_trades" not in st.session_state:
-    st.session_state.paper_trades = []
-if "owner_income" not in st.session_state:
-    st.session_state.owner_income = 0.0
+if "logged_in" not in st.session_state: st.session_state.logged_in = False
+if "current_user" not in st.session_state: st.session_state.current_user = None
+if "paper_balance" not in st.session_state: st.session_state.paper_balance = 1000.0
+if "paper_trades" not in st.session_state: st.session_state.paper_trades = []
+if "owner_income" not in st.session_state: st.session_state.owner_income = 0.0
+if "grid_settings" not in st.session_state: st.session_state.grid_settings = {}
+if "session_settings" not in st.session_state: st.session_state.session_settings = {}
 
 OWNER_PIN = "Aqsa@7860"
 LIVE_LINK = "https://nexbot-ai-q7eycecsypyvxagq8tgcyu.streamlit.app"
 MEMBERSHIP_FEE = 30
 OWNER_PROFIT_SHARE = 0.10
 
-# ====================== LOGIN / REGISTER ======================
+# ====================== LOGIN ======================
 if not st.session_state.logged_in:
     st.markdown("<h1 style='text-align:center;color:#38bdf8;'>🤖 NexBot AI</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;color:#94a3b8;'>Smart Trading System</p>", unsafe_allow_html=True)
 
     tab1, tab2 = st.tabs(["Login", "Register"])
-
     with tab1:
         st.subheader("Login")
         mobile = st.text_input("Mobile Number", key="login_mobile")
@@ -146,7 +126,6 @@ if not st.session_state.logged_in:
         ref_code = st.text_input("Referral Code (Optional)")
         password_reg = st.text_input("Create Password", type="password", key="reg_pass")
         confirm = st.text_input("Confirm Password", type="password")
-
         if st.button("Register", use_container_width=True):
             if not name or not mobile_reg or not password_reg:
                 st.error("Please fill all required fields")
@@ -157,45 +136,34 @@ if not st.session_state.logged_in:
             else:
                 new_code = generate_referral_code()
                 if create_user(name, mobile_reg, password_reg, new_code, ref_code):
-                    st.success(f"Registration successful! Your Referral Code is: **{new_code}**")
+                    st.success(f"Registration successful! Your Referral Code: **{new_code}**")
                     st.balloons()
-                else:
-                    st.error("Registration failed. Try again.")
 
 else:
     user = st.session_state.current_user
-    # Refresh user data from Supabase
-    fresh_user = get_user_by_mobile(user["mobile"])
-    if fresh_user:
-        user = fresh_user
-        st.session_state.current_user = fresh_user
-
+    fresh = get_user_by_mobile(user["mobile"])
+    if fresh:
+        user = fresh
+        st.session_state.current_user = fresh
     client = get_client()
 
-    # ====================== SIDEBAR ======================
+    # SIDEBAR
     st.sidebar.markdown(f"### 👋 {user['name']}")
     st.sidebar.markdown(f"**Mobile:** {user['mobile']}")
     st.sidebar.markdown(f"**Referral:** `{user['referral_code']}`")
     st.sidebar.markdown(f"**Membership:** {'✅ Active' if user.get('membership') else '❌ Inactive'}")
     st.sidebar.markdown(f"**Paper Balance:** `{st.session_state.paper_balance:.2f} USDT`")
-
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.current_user = None
         st.rerun()
 
     page = st.sidebar.selectbox("Menu", [
-        "🏠 Dashboard",
-        "💎 Membership",
-        "🤖 Trading Core",
-        "📄 Paper Trading",
-        "🎛️ Smart Grid Pro",
-        "⏰ Dual Session",
-        "👥 Referral + Share",
-        "👑 Owner Panel"
+        "🏠 Dashboard", "💎 Membership", "🤖 Trading Core", "📄 Paper Trading",
+        "🎛️ Smart Grid Pro", "⏰ Dual Session", "👥 Referral + Share", "👑 Owner Panel"
     ])
 
-    # ====================== DASHBOARD ======================
+    # DASHBOARD
     if page == "🏠 Dashboard":
         st.markdown("## 🏠 Dashboard")
         c1, c2, c3, c4 = st.columns(4)
@@ -203,164 +171,191 @@ else:
         c2.metric("Referral Code", user["referral_code"])
         c3.metric("Paper Balance", f"{st.session_state.paper_balance:.2f} USDT")
         c4.metric("Owner Share", "10%")
-
         if not user.get("membership"):
-            st.warning("Your membership is not active. Please complete payment from Membership page.")
+            st.warning("Membership inactive. Please activate from Membership page.")
 
-    # ====================== MEMBERSHIP ======================
+    # MEMBERSHIP
     elif page == "💎 Membership":
         st.markdown("## 💎 Membership")
         st.info(f"Membership Fee: **{MEMBERSHIP_FEE} USDT (TRC20)**")
-
         if user.get("membership"):
             st.success("Your membership is Active!")
         else:
-            st.markdown("### Payment Instructions")
-            st.write(f"1. Send **{MEMBERSHIP_FEE} USDT (TRC20)** to this address:")
+            st.write(f"Send **{MEMBERSHIP_FEE} USDT (TRC20)** to:")
             st.code(TRC20_WALLET)
-            st.write("2. Copy the Transaction ID")
-            st.write("3. Submit the form below")
-            st.write("4. Wait for Owner verification")
-
-            st.divider()
-            tx_id = st.text_input("Transaction ID / Hash")
-            note = st.text_input("Note (Optional)")
-
-            if st.button("Submit Membership Request", type="primary", use_container_width=True):
-                if not tx_id:
-                    st.error("Please enter Transaction ID")
+            tx_id = st.text_input("Transaction ID")
+            if st.button("Submit Request", type="primary"):
+                if tx_id:
+                    st.success("Request submitted! Wait for Owner activation.")
                 else:
-                    st.success("Request submitted! Please wait for Owner to activate.")
-                    st.info(f"TX ID: {tx_id}")
-                    st.balloons()
+                    st.error("Enter Transaction ID")
 
-    # ====================== TRADING CORE ======================
+    # TRADING CORE
     elif page == "🤖 Trading Core":
         if not user.get("membership"):
-            st.warning("Please activate Membership first.")
+            st.warning("Activate Membership first.")
         else:
             st.markdown("## 🤖 Trading Core")
             if client:
                 cols = st.columns(4)
                 for i, sym in enumerate(["SOLUSDT", "BTCUSDT", "ETHUSDT", "BNBUSDT"]):
                     price = get_price(client, sym)
-                    cols[i].metric(sym.replace("USDT", "/USDT"), f"${price:,.2f}" if price else "—")
-
+                    cols[i].metric(sym.replace("USDT","/USDT"), f"${price:,.2f}" if price else "—")
             c1, c2, c3 = st.columns(3)
             capital = c1.number_input("Capital (USDT)", value=30.0)
             target = c2.number_input("Target %", value=0.7)
             down = c3.number_input("Down %", value=1.0)
-
-            profit = capital * (target / 100)
+            profit = capital * (target/100)
             owner_share = profit * OWNER_PROFIT_SHARE
-            user_profit = profit - owner_share
-
             st.metric("Gross Profit", f"{profit:.4f} USDT")
             st.metric("Owner Share (10%)", f"{owner_share:.4f} USDT")
-            st.metric("Your Net Profit", f"{user_profit:.4f} USDT")
-
+            st.metric("Your Net Profit", f"{profit-owner_share:.4f} USDT")
             if st.button("Launch Strategy", type="primary"):
                 st.session_state.owner_income += owner_share
-                st.success(f"Strategy Launched! Your Net Profit: {user_profit:.4f} USDT")
+                st.success("Strategy Launched!")
                 st.balloons()
 
-    # ====================== PAPER TRADING ======================
+    # PAPER TRADING
     elif page == "📄 Paper Trading":
         st.markdown("## 📄 Paper Trading")
-        st.info(f"Available Paper Balance: **{st.session_state.paper_balance:.2f} USDT**")
-
+        st.info(f"Paper Balance: **{st.session_state.paper_balance:.2f} USDT**")
         c1, c2, c3, c4 = st.columns(4)
-        symbol = c1.selectbox("Symbol", ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"])
+        symbol = c1.selectbox("Symbol", ["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT"])
         amount = c2.number_input("Amount (USDT)", value=20.0, min_value=1.0)
-        side = c3.selectbox("Side", ["BUY", "SELL"])
+        side = c3.selectbox("Side", ["BUY","SELL"])
         leverage = c4.number_input("Leverage (x)", value=1.0, min_value=0.5, max_value=20.0, step=0.5)
-
-        if st.button("Place Paper Order", type="primary", use_container_width=True):
+        if st.button("Place Paper Order", type="primary"):
             if amount > st.session_state.paper_balance:
-                st.error("Insufficient Paper Balance")
+                st.error("Insufficient balance")
             else:
                 st.session_state.paper_balance -= amount
-                trade = {
+                st.session_state.paper_trades.append({
                     "time": datetime.now().strftime("%H:%M:%S"),
-                    "symbol": symbol,
-                    "side": side,
-                    "amount": amount,
-                    "leverage": leverage
-                }
-                st.session_state.paper_trades.append(trade)
-                st.success(f"Paper {side} order placed: {amount} USDT | {leverage}x")
-                st.balloons()
-
+                    "symbol": symbol, "side": side, "amount": amount, "leverage": leverage
+                })
+                st.success(f"{side} {amount} USDT | {leverage}x")
         if st.session_state.paper_trades:
             st.divider()
-            st.markdown("### Recent Paper Trades")
-            for t in reversed(st.session_state.paper_trades[-10:]):
-                st.write(f"{t['time']} | {t['side']} | {t['symbol']} | {t['amount']} USDT | {t['leverage']}x")
+            for t in reversed(st.session_state.paper_trades[-8:]):
+                st.write(f"{t['time']} | {t['side']} | {t['symbol']} | {t['amount']} | {t['leverage']}x")
 
-    # ====================== SMART GRID ======================
+    # ====================== SMART GRID PRO (IMPROVED) ======================
     elif page == "🎛️ Smart Grid Pro":
         if not user.get("membership"):
-            st.warning("Please activate Membership first.")
+            st.warning("Activate Membership first.")
         else:
             st.markdown("## 🎛️ Smart Grid Pro")
-            st.toggle("Grid Running")
-            st.toggle("Auto Compound")
-            for i in range(6):
-                cols = st.columns(3)
-                cols[0].number_input(f"Level {i+1} USDT", value=10.0, key=f"gu{i}")
-                cols[1].number_input(f"Target %", value=0.7, key=f"gt{i}")
-                cols[2].number_input(f"Down %", value=1.0, key=f"gd{i}")
-            if st.button("Save Grid"):
-                st.success("Grid Saved!")
+            st.caption("Strict Mode: Bot waits for Down % + Confirmation Bounce before entry")
 
-    # ====================== DUAL SESSION ======================
+            c1, c2, c3 = st.columns(3)
+            grid_on = c1.toggle("Grid Running", value=False)
+            auto_compound = c2.toggle("Auto Compound", value=True)
+            mode = c3.selectbox("Mode", ["Strict", "Normal", "Aggressive"])
+
+            st.divider()
+            st.markdown("### Grid Levels (Max 8)")
+            st.caption("Down % = Kitna girne pe wait | Confirmation = Upar bounce ke baad entry")
+
+            levels = []
+            for i in range(8):
+                cols = st.columns(4)
+                usdt = cols[0].number_input(f"L{i+1} USDT", value=10.0, key=f"gu{i}")
+                target = cols[1].number_input(f"Target %", value=0.7, key=f"gt{i}")
+                down = cols[2].number_input(f"Down %", value=0.5, key=f"gd{i}", help="User setting")
+                conf = cols[3].number_input(f"Confirm %", value=0.2, key=f"gc{i}", help="Strict bounce")
+                levels.append({"usdt": usdt, "target": target, "down": down, "confirm": conf})
+
+            st.divider()
+            st.markdown("### How Strict Mode Works")
+            st.info("""
+            1. Price girna start kare → Bot **intezaar** karega  
+            2. User ka **Down %** hit ho → Bot still wait karega  
+            3. Price thoda **uper bounce** kare (Confirm %) → Tab entry  
+            4. Chhoti upar-neeche ignore hogi  
+            """)
+
+            if st.button("Save Grid Settings", type="primary", use_container_width=True):
+                st.session_state.grid_settings = {
+                    "running": grid_on,
+                    "auto_compound": auto_compound,
+                    "mode": mode,
+                    "levels": levels
+                }
+                st.success(f"Grid Saved! Mode: {mode} | Levels: {len(levels)}")
+                st.balloons()
+
+    # ====================== DUAL SESSION (IMPROVED) ======================
     elif page == "⏰ Dual Session":
         if not user.get("membership"):
-            st.warning("Please activate Membership first.")
+            st.warning("Activate Membership first.")
         else:
             st.markdown("## ⏰ Dual Session Hunter")
-            st.write("Session 1: 12:00 AM | Session 2: 1:00 PM")
-            st.toggle("Activate Session 1")
-            st.toggle("Activate Session 2")
-            if st.button("Save Sessions"):
-                st.success("Saved!")
+            st.caption("Strict Mode: Session time + Down % + Confirmation Bounce")
 
-    # ====================== REFERRAL ======================
+            st.markdown("### Session 1 (Night)")
+            c1, c2, c3 = st.columns(3)
+            s1_on = c1.toggle("Activate Session 1", value=False)
+            s1_coin = c2.selectbox("Coin", ["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT"], key="s1c")
+            s1_time = c3.time_input("Start Time", value=datetime.strptime("00:00","%H:%M").time())
+
+            c4, c5, c6 = st.columns(3)
+            s1_usdt = c4.number_input("USDT", value=20.0, key="s1u")
+            s1_down = c5.number_input("Down %", value=0.5, key="s1d")
+            s1_conf = c6.number_input("Confirm %", value=0.2, key="s1f")
+
+            st.divider()
+            st.markdown("### Session 2 (Afternoon)")
+            c1, c2, c3 = st.columns(3)
+            s2_on = c1.toggle("Activate Session 2", value=False)
+            s2_coin = c2.selectbox("Coin", ["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT"], key="s2c")
+            s2_time = c3.time_input("Start Time", value=datetime.strptime("13:00","%H:%M").time())
+
+            c4, c5, c6 = st.columns(3)
+            s2_usdt = c4.number_input("USDT", value=20.0, key="s2u")
+            s2_down = c5.number_input("Down %", value=0.5, key="s2d")
+            s2_conf = c6.number_input("Confirm %", value=0.2, key="s2f")
+
+            st.divider()
+            st.markdown("### How Dual Session Works (Strict)")
+            st.info("""
+            1. Session time start hote hi bot **watch** karega  
+            2. Price Down % tak gire → Bot wait karega  
+            3. Confirm % bounce aaye → Turant entry  
+            4. Dono sessions alag-alag settings se chalenge  
+            """)
+
+            if st.button("Save Dual Session", type="primary", use_container_width=True):
+                st.session_state.session_settings = {
+                    "s1": {"on": s1_on, "coin": s1_coin, "time": str(s1_time), "usdt": s1_usdt, "down": s1_down, "confirm": s1_conf},
+                    "s2": {"on": s2_on, "coin": s2_coin, "time": str(s2_time), "usdt": s2_usdt, "down": s2_down, "confirm": s2_conf}
+                }
+                st.success("Dual Session Settings Saved!")
+                st.balloons()
+
+    # REFERRAL
     elif page == "👥 Referral + Share":
         st.markdown("## 👥 Referral + Share")
         st.success(f"Your Referral Code: `{user['referral_code']}`")
-
-        msg = f"""🚀 NexBot AI
-
-I am using NexBot AI.
-
-Open App: {LIVE_LINK}
-
-My Referral Code: {user['referral_code']}
-
-Join now!"""
+        msg = f"🚀 NexBot AI\n\nOpen: {LIVE_LINK}\n\nMy Code: {user['referral_code']}\n\nJoin now!"
         url = "https://wa.me/?text=" + urllib.parse.quote(msg)
         st.markdown(f'<a href="{url}" target="_blank"><button style="background:#25D366;color:white;padding:14px;border:none;border-radius:10px;width:100%;font-weight:bold;">Share on WhatsApp</button></a>', unsafe_allow_html=True)
 
-    # ====================== OWNER PANEL ======================
+    # OWNER PANEL
     elif page == "👑 Owner Panel":
         st.markdown("## 👑 Owner Panel")
         pin = st.text_input("Owner Password", type="password")
         if pin == OWNER_PIN:
             st.success("Access Granted")
-
             users = get_all_users()
             c1, c2, c3 = st.columns(3)
             c1.metric("Owner Vault", f"{st.session_state.owner_income:.2f} USDT")
             c2.metric("Total Users", len(users))
-            active_count = len([u for u in users if u.get("membership")])
-            c3.metric("Active Members", active_count)
-
+            c3.metric("Active Members", len([u for u in users if u.get("membership")]))
             st.divider()
             st.markdown("### All Users")
             for u in users:
                 status = "✅ Active" if u.get("membership") else "❌ Inactive"
-                col1, col2 = st.columns([3, 1])
+                col1, col2 = st.columns([3,1])
                 with col1:
                     st.write(f"**{u['name']}** | {u['mobile']} | {status} | `{u['referral_code']}`")
                 with col2:
