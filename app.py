@@ -1,79 +1,56 @@
 import streamlit as st
-import pandas as pd
 import urllib.parse
 from datetime import datetime
 from binance.client import Client
 import random
 import string
+from supabase import create_client, Client as SupabaseClient
 
 st.set_page_config(page_title="NexBot AI", page_icon="🤖", layout="wide", initial_sidebar_state="expanded")
 
-# ====================== API KEYS ======================
+# ====================== SUPABASE ======================
+SUPABASE_URL = "https://uktmbjwcsqgdciwuprhp.supabase.co"
+SUPABASE_KEY = "sb_publishable_SWlh8SwyNlRZBCtGDUkyeg_pfGlyJr1"
+
+supabase: SupabaseClient = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# ====================== BINANCE ======================
 API_KEY = "f79GlppYGMwTMdfKJdVZdSeIcugbam6hca0omva71gg8pHyhHc3p4dB6MgiFbnvH"
 API_SECRET = "cM2OuD31KMzpsL1AG7Ivlf8b8nS9vjZC13yHqeeFuqfBl80bdZNzQIxnaCnTt7Wi"
 
 # ====================== TRC20 WALLET ======================
 TRC20_WALLET = "TYourWalletAddressHere"
 
-# ====================== CSS - FULL DARK MODE ======================
+# ====================== CSS ======================
 st.markdown("""
 <style>
-    .stApp {
-        background: linear-gradient(135deg, #0a0e17, #111827, #0f172a);
-        color: #f1f5f9;
-    }
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a, #1e293b);
-        border-right: 1px solid #334155;
-    }
-    h1, h2, h3, h4 {
-        color: #38bdf8 !important;
-    }
-    p, span, label, .stMarkdown {
-        color: #e2e8f0 !important;
-    }
+    .stApp { background: linear-gradient(135deg, #0a0e17, #111827, #0f172a); color: #f1f5f9; }
+    section[data-testid="stSidebar"] { background: linear-gradient(180deg, #0f172a, #1e293b); border-right: 1px solid #334155; }
+    h1, h2, h3, h4 { color: #38bdf8 !important; }
+    p, span, label, .stMarkdown { color: #e2e8f0 !important; }
     .stTextInput label, .stNumberInput label, .stSelectbox label {
-        color: #7dd3fc !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
+        color: #7dd3fc !important; font-weight: 600 !important; font-size: 14px !important;
     }
     .stTextInput input, .stNumberInput input {
-        background-color: #1e293b !important;
-        color: #f8fafc !important;
-        border: 1px solid #38bdf8 !important;
-        border-radius: 8px !important;
+        background-color: #1e293b !important; color: #f8fafc !important;
+        border: 1px solid #38bdf8 !important; border-radius: 8px !important;
     }
     .stButton > button {
         background: linear-gradient(90deg, #e11d48, #7c3aed) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 10px !important;
+        color: white !important; border: none !important; border-radius: 10px !important;
         font-weight: bold !important;
     }
-    [data-testid="stMetricValue"] {
-        color: #4ade80 !important;
-    }
-    .stAlert {
-        background-color: #1e293b !important;
-        color: #e2e8f0 !important;
-    }
+    [data-testid="stMetricValue"] { color: #4ade80 !important; }
     #MainMenu, footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# ====================== BINANCE ======================
+# ====================== HELPERS ======================
 def get_client():
     try:
         return Client(API_KEY, API_SECRET)
     except:
         return None
-
-def get_balance(client):
-    try:
-        acc = client.get_account()
-        return [{"asset": b["asset"], "free": float(b["free"])} for b in acc["balances"] if float(b["free"]) > 0]
-    except:
-        return []
 
 def get_price(client, symbol="BTCUSDT"):
     try:
@@ -84,32 +61,57 @@ def get_price(client, symbol="BTCUSDT"):
 def generate_referral_code():
     return "NEXBOT" + "".join(random.choices(string.digits, k=4))
 
-# ====================== SESSION STATE ======================
-if "users" not in st.session_state:
-    st.session_state.users = {}
+def get_user_by_mobile(mobile):
+    try:
+        res = supabase.table("users").select("*").eq("mobile", mobile).execute()
+        if res.data:
+            return res.data[0]
+        return None
+    except:
+        return None
 
-if "pending_memberships" not in st.session_state:
-    st.session_state.pending_memberships = []
+def create_user(name, mobile, password, referral_code, used_referral):
+    try:
+        data = {
+            "name": name,
+            "mobile": mobile,
+            "password": password,
+            "referral_code": referral_code,
+            "used_referral": used_referral,
+            "membership": False,
+            "joined": datetime.now().strftime("%d-%m-%Y %H:%M")
+        }
+        res = supabase.table("users").insert(data).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error: {e}")
+        return False
 
-if "paper_trades" not in st.session_state:
-    st.session_state.paper_trades = []
+def update_membership(mobile, status=True):
+    try:
+        supabase.table("users").update({"membership": status}).eq("mobile", mobile).execute()
+        return True
+    except:
+        return False
 
+def get_all_users():
+    try:
+        res = supabase.table("users").select("*").execute()
+        return res.data
+    except:
+        return []
+
+# ====================== SESSION ======================
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
-
-defaults = {
-    "owner_income": 0.0,
-    "total_profit": 0.0,
-    "paper_balance": 1000.0,
-    "grid_running": False,
-    "auto_compound": True,
-}
-for k, v in defaults.items():
-    if k not in st.session_state:
-        st.session_state[k] = v
+if "paper_balance" not in st.session_state:
+    st.session_state.paper_balance = 1000.0
+if "paper_trades" not in st.session_state:
+    st.session_state.paper_trades = []
+if "owner_income" not in st.session_state:
+    st.session_state.owner_income = 0.0
 
 OWNER_PIN = "Aqsa@7860"
 LIVE_LINK = "https://nexbot-ai-q7eycecsypyvxagq8tgcyu.streamlit.app"
@@ -128,9 +130,10 @@ if not st.session_state.logged_in:
         mobile = st.text_input("Mobile Number", key="login_mobile")
         password = st.text_input("Password", type="password", key="login_pass")
         if st.button("Login", use_container_width=True):
-            if mobile in st.session_state.users and st.session_state.users[mobile]["password"] == password:
+            user = get_user_by_mobile(mobile)
+            if user and user["password"] == password:
                 st.session_state.logged_in = True
-                st.session_state.current_user = st.session_state.users[mobile]
+                st.session_state.current_user = user
                 st.success("Login successful!")
                 st.rerun()
             else:
@@ -149,24 +152,24 @@ if not st.session_state.logged_in:
                 st.error("Please fill all required fields")
             elif password_reg != confirm:
                 st.error("Passwords do not match")
-            elif mobile_reg in st.session_state.users:
+            elif get_user_by_mobile(mobile_reg):
                 st.error("Mobile already registered")
             else:
                 new_code = generate_referral_code()
-                st.session_state.users[mobile_reg] = {
-                    "name": name,
-                    "mobile": mobile_reg,
-                    "password": password_reg,
-                    "referral_code": new_code,
-                    "used_referral": ref_code,
-                    "membership": False,
-                    "joined": datetime.now().strftime("%d-%m-%Y %H:%M")
-                }
-                st.success(f"Registration successful! Your Referral Code is: **{new_code}**")
-                st.balloons()
+                if create_user(name, mobile_reg, password_reg, new_code, ref_code):
+                    st.success(f"Registration successful! Your Referral Code is: **{new_code}**")
+                    st.balloons()
+                else:
+                    st.error("Registration failed. Try again.")
 
 else:
     user = st.session_state.current_user
+    # Refresh user data from Supabase
+    fresh_user = get_user_by_mobile(user["mobile"])
+    if fresh_user:
+        user = fresh_user
+        st.session_state.current_user = fresh_user
+
     client = get_client()
 
     # ====================== SIDEBAR ======================
@@ -227,15 +230,8 @@ else:
                 if not tx_id:
                     st.error("Please enter Transaction ID")
                 else:
-                    st.session_state.pending_memberships.append({
-                        "name": user["name"],
-                        "mobile": user["mobile"],
-                        "tx_id": tx_id,
-                        "note": note,
-                        "time": datetime.now().strftime("%d-%m-%Y %H:%M"),
-                        "status": "Pending"
-                    })
-                    st.success("Request submitted! Please wait for activation.")
+                    st.success("Request submitted! Please wait for Owner to activate.")
+                    st.info(f"TX ID: {tx_id}")
                     st.balloons()
 
     # ====================== TRADING CORE ======================
@@ -265,13 +261,12 @@ else:
 
             if st.button("Launch Strategy", type="primary"):
                 st.session_state.owner_income += owner_share
-                st.session_state.total_profit += user_profit
                 st.success(f"Strategy Launched! Your Net Profit: {user_profit:.4f} USDT")
                 st.balloons()
 
     # ====================== PAPER TRADING ======================
     elif page == "📄 Paper Trading":
-        st.markdown("## 📄 Paper Trading (Strong Mode)")
+        st.markdown("## 📄 Paper Trading")
         st.info(f"Available Paper Balance: **{st.session_state.paper_balance:.2f} USDT**")
 
         c1, c2, c3, c4 = st.columns(4)
@@ -293,7 +288,7 @@ else:
                     "leverage": leverage
                 }
                 st.session_state.paper_trades.append(trade)
-                st.success(f"Paper {side} order placed: {amount} USDT on {symbol} with {leverage}x leverage")
+                st.success(f"Paper {side} order placed: {amount} USDT | {leverage}x")
                 st.balloons()
 
         if st.session_state.paper_trades:
@@ -308,18 +303,15 @@ else:
             st.warning("Please activate Membership first.")
         else:
             st.markdown("## 🎛️ Smart Grid Pro")
-            c1, c2 = st.columns(2)
-            st.session_state.grid_running = c1.toggle("Grid Running", value=st.session_state.grid_running)
-            st.session_state.auto_compound = c2.toggle("Auto Compound", value=st.session_state.auto_compound)
-
-            for i in range(8):
+            st.toggle("Grid Running")
+            st.toggle("Auto Compound")
+            for i in range(6):
                 cols = st.columns(3)
                 cols[0].number_input(f"Level {i+1} USDT", value=10.0, key=f"gu{i}")
                 cols[1].number_input(f"Target %", value=0.7, key=f"gt{i}")
                 cols[2].number_input(f"Down %", value=1.0, key=f"gd{i}")
-
-            if st.button("Save Grid Settings", type="primary"):
-                st.success("Grid Settings Saved!")
+            if st.button("Save Grid"):
+                st.success("Grid Saved!")
 
     # ====================== DUAL SESSION ======================
     elif page == "⏰ Dual Session":
@@ -327,11 +319,11 @@ else:
             st.warning("Please activate Membership first.")
         else:
             st.markdown("## ⏰ Dual Session Hunter")
-            st.write("**Session 1:** 12:00 AM | **Session 2:** 1:00 PM")
+            st.write("Session 1: 12:00 AM | Session 2: 1:00 PM")
             st.toggle("Activate Session 1")
             st.toggle("Activate Session 2")
             if st.button("Save Sessions"):
-                st.success("Sessions Saved!")
+                st.success("Saved!")
 
     # ====================== REFERRAL ======================
     elif page == "👥 Referral + Share":
@@ -357,34 +349,26 @@ Join now!"""
         if pin == OWNER_PIN:
             st.success("Access Granted")
 
+            users = get_all_users()
             c1, c2, c3 = st.columns(3)
             c1.metric("Owner Vault", f"{st.session_state.owner_income:.2f} USDT")
-            c2.metric("Total Users", len(st.session_state.users))
-            pending = len([x for x in st.session_state.pending_memberships if x["status"] == "Pending"])
-            c3.metric("Pending Requests", pending)
-
-            st.divider()
-            st.markdown("### Pending Membership Requests")
-            if st.session_state.pending_memberships:
-                for i, req in enumerate(st.session_state.pending_memberships):
-                    if req["status"] == "Pending":
-                        with st.expander(f"{req['name']} | {req['mobile']} | {req['time']}"):
-                            st.write(f"TX ID: `{req['tx_id']}`")
-                            st.write(f"Note: {req['note']}")
-                            if st.button(f"Activate {req['name']}", key=f"act_{i}"):
-                                if req["mobile"] in st.session_state.users:
-                                    st.session_state.users[req["mobile"]]["membership"] = True
-                                req["status"] = "Activated"
-                                st.session_state.owner_income += 20
-                                st.success(f"{req['name']} Activated!")
-                                st.rerun()
-            else:
-                st.info("No pending requests")
+            c2.metric("Total Users", len(users))
+            active_count = len([u for u in users if u.get("membership")])
+            c3.metric("Active Members", active_count)
 
             st.divider()
             st.markdown("### All Users")
-            for mobile, data in st.session_state.users.items():
-                status = "Active" if data.get("membership") else "Inactive"
-                st.write(f"{data['name']} | {mobile} | {status} | {data['referral_code']}")
+            for u in users:
+                status = "✅ Active" if u.get("membership") else "❌ Inactive"
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(f"**{u['name']}** | {u['mobile']} | {status} | `{u['referral_code']}`")
+                with col2:
+                    if not u.get("membership"):
+                        if st.button("Activate", key=f"act_{u['mobile']}"):
+                            if update_membership(u["mobile"], True):
+                                st.session_state.owner_income += 20
+                                st.success(f"{u['name']} Activated!")
+                                st.rerun()
         elif pin:
             st.error("Wrong Password")
